@@ -1,9 +1,4 @@
 <h1 align="center">『 𖤍𝐌𝐚𝐫𝐢𝐧_𝐊𝐢𝐭𝐚𝐠𝐚𝐰𝐚-𝐁𝐨𝐭 𖤍 』</h1>
-
- <p align="center">
-  <img src="https://i.postimg.cc/N0TJK47c/catalogo.png" alt="Marin Kitagawa Bot Preview" />
-</p>
-
 ---
 
 ### **🎬 Video de presentación**
