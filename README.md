@@ -112,7 +112,7 @@ npm start
 href="https://github.com/Yasu-jc"><img src="https://github.com/Yasu-jc.png" width="130" height="130" alt="
 iam|⨀⃝⃟⃞༺𝔜𝔞𝔰𝔲༻𝔣𝔣❀"/></a>
 
-### **`🜸 Créditos`**
-<a href="https://github.com/canserbero-coder" style="display:inline-block; text-decoration: none;">
-    <img src="https://github.com/canserbero-coder.png" width="130" height="130" alt="Alex-X" style="border-radius: 50%;"/>
+//### **`🜸 Créditos`**
+//<a href="https://github.com/canserbero-coder" //style="display:inline-block; text-decoration: none;">
+//    <img src="https://github.com/canserbero-coder.png" //width="130" height="130" alt="Alex-X" style="border-radius: 50%;"/>
 </a>
