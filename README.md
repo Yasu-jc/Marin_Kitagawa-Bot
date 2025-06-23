@@ -1,12 +1,13 @@
 <h1 align="center">『 𖤍𝐌𝐚𝐫𝐢𝐧_𝐊𝐢𝐭𝐚𝐠𝐚𝐰𝐚-𝐁𝐨𝐭 𖤍 』</h1>
+
+<p align="center">
+  <img src="https://makeagif.com/i/CPfeOF" alt="Marin Kitagawa Animación" width="350"/>
+</p>
+
+### **🎬 Video animado de presentación**
+Si tu navegador no soporta GIF, [puedes ver el video aquí](https://zero-two.info/uploads/videos/file-1750697942583-439795193.mp4)
+
 ---
-
-### **🎬 Video de presentación**
-
-[Ver video de presentación](https://zero-two.info/uploads/videos/file-1750697942583-439795193.mp4)
-
-[![Ver video](https://i.postimg.cc/Kv7Lcf7c/4581d7b3704643d9378eac636d9d394e.jpg)](https://zero-two.info/uploads/videos/file-1750697942583-439795193.mp4)
-
 ---
 
 ### **`❕️ Información importante`**
