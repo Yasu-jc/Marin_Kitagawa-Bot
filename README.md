@@ -61,11 +61,7 @@ git clone https://github.com/Yasu-jc/Marin_Kitagawa-Bot && cd Marin_Kitagawa-Bot
 ```
 
 ```bash
-yarn install
-```
-
-```bash
-npm install
+yarn install && npm install
 ```
 
 ```bash
