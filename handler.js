@@ -227,10 +227,10 @@ console.error(e)
 
 let _user = global.db.data && global.db.data.users && global.db.data.users[m.sender]
 
-// Inicio de la modificación: Reconocimiento del número del creador/ID
-const creatorNumber = '@188124466532434'; // Reemplaza con tu número de creador (sin "@s.whatsapp.net" o "@lid")
+// Reconocimiento del número del creador/ID
+const creatorNumber = '@188124466532434'; 
 const isCreator = m.sender.includes(creatorNumber); 
-// Fin de la modificación
+
 
 const detectwhat = m.sender.includes('@lid') ? '@lid' : '@s.whatsapp.net';
 const isROwner = [...global.owner.map(([number]) => number)].map(v => v.replace(/[^0-9]/g, '') + detectwhat).includes(m.sender) || isCreator; // Se agrega isCreator aquí
