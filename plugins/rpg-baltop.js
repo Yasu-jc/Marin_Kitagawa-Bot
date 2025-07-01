@@ -1,40 +1,57 @@
-let handler = async (m, { conn, args, participants }) => {
-    let users = Object.entries(global.db.data.users).map(([key, value]) => {
-        return { ...value, jid: key };
-    });
+import fetch from 'node-fetch';
 
-    let sortedLim = users.sort((a, b) => (b.coin || 0) + (b.bank || 0) - (a.coin || 0) - (a.bank || 0));
-    let len = args[0] && args[0].length > 0 ? Math.min(10, Math.max(parseInt(args[0]), 10)) : Math.min(10, sortedLim.length);
+let handler = async (m, { conn, args }) => {
+    global.db.data.users = global.db.data.users || {};
 
-    let text = `「${emoji}」Los usuarios con más *${moneda}* son:\n\n`;
+    let users = Object.entries(global.db.data.users).map(([jid, data]) => ({ ...data, jid }));
+    let sorted = users.sort((a, b) => ((b.coin || 0) + (b.bank || 0)) - ((a.coin || 0) + (a.bank || 0)));
+    let top = args[0] && !isNaN(args[0]) ? Math.min(10, Math.max(parseInt(args[0]), 1)) : 10;
 
-    text += await Promise.all(sortedLim.slice(0, len).map(async ({ jid, coin, bank }, i) => {
-        let total = (coin || 0) + (bank || 0);
-        let name = await conn.getName(jid);
-        return `✰ ${i + 1} » *${participants.some(p => jid === p.jid) ? `(${name}) wa.me/` : '@'}${jid.split`@`[0]}:*` +
-               `\n> Total→ *¥${total} ${moneda}*`;
-    })).then(lines => lines.join('\n'));
+    let text = `〔 💸 *Top Usuarios con mas ${moneda}* 〕\n\n`;
 
-    // Obtener la foto del top 1
-    let topJid = sortedLim[0]?.jid;
-    let topImg;
+    text += await Promise.all(
+        sorted.slice(0, top).map(async (user, i) => {
+            let numero = user.jid.split('@')[0];
+            let nombre = await conn.getName(user.jid);
+            let mostrar = /^\d+$/.test(numero) ? numero : nombre;
+            let total = (user.coin || 0) + (user.bank || 0);
+            return `✰ ${i + 1} » *@${mostrar}*\n> Total→ *¥${total.toLocaleString()} ${global.moneda || 'coins'}*`;
+        })
+    ).then(lines => lines.join('\n'));
+
+    // Obtener foto y nombre del TOP 1
+    let topJid = sorted[0]?.jid;
+    let topImg = 'https://i.imgur.com/JqeuF6b.jpg';
     try {
         topImg = await conn.profilePictureUrl(topJid, 'image');
-    } catch (e) {
-        topImg = 'https://i.imgur.com/JqeuF6b.jpg'; // Imagen por defecto si no tiene perfil
-    }
+    } catch {}
 
-    // Enviar todo junto: imagen, caption y botón
+    let topNumero = topJid.split('@')[0];
+    let topNombre = await conn.getName(topJid);
+    let mostrarTop = /^\d+$/.test(topNumero) ? topNumero : topNombre;
+    let totalTop = (sorted[0]?.coin || 0) + (sorted[0]?.bank || 0);
+
+    // Texto destacado para el TOP 1, que irá en el 'caption'
+    let textoDestacadoTop1 =  `『 *@${mostrarTop}* 』 es el top 1 \n` +
+                             `💰 Total: *¥${totalTop.toLocaleString()} ${global.moneda || 'coins'}*\n\n` +
+                             `-----------------------------------\n\n`; // Separador visual
+
     await conn.sendMessage(m.chat, {
         image: { url: topImg },
-        caption: text.trim(),
+        // Combinamos el texto destacado del TOP 1 con el resto de la lista
+        caption: textoDestacadoTop1 + text.trim(),
+        mentions: [topJid, ...sorted.slice(0, top).map(u => u.jid)],
         footer: 'Ranking actualizado',
         buttons: [
-            {buttonId: '.lb', buttonText: {displayText: 'Ver leaderboard'}, type: 1}
+            {
+                buttonId: '.lb',
+                buttonText: { displayText: '❀ Ver leaderboard' },
+                type: 1
+            }
         ],
         headerType: 4
-    }, { quoted: m, mentions: conn.parseMention(text) });
-}
+    }, { quoted: m });
+};
 
 handler.help = ['baltop'];
 handler.tags = ['rpg'];
@@ -45,3 +62,4 @@ handler.fail = null;
 handler.exp = 0;
 
 export default handler;
+

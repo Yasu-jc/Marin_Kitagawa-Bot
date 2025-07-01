@@ -3,15 +3,66 @@ import PhoneNumber from 'awesome-phonenumber';
 import fetch from 'node-fetch';
 
 let handler = async (m, { conn, args }) => {
-    // Prioridad: args[0] → m.quoted.sender → m.mentionedJid[0] → m.sender
-    let userId =
-        (args[0] && args[0].includes('@')) ? args[0]
-        : (m.quoted && m.quoted.sender) ? m.quoted.sender
-        : (m.mentionedJid && m.mentionedJid[0]) ? m.mentionedJid[0]
-        : m.sender;
+    let userId;
 
-    let user = global.db.data.users[userId] || {};
-    let name = await conn.getName(userId);
+    // 1. Intentar con mención directa (ej: @usuario)
+    if (m.mentionedJid && m.mentionedJid[0]) {
+        userId = m.mentionedJid[0];
+    } 
+    // 2. Si no hay mención, intentar con el remitente del mensaje citado (si se respondió a alguien)
+    else if (m.quoted && m.quoted.sender) {
+        userId = m.quoted.sender;
+    } 
+    // 3. Si no hay mención ni cita, usar el ID del remitente del comando
+    else {
+        userId = m.sender;
+    }
+
+    // Asegurarse de que el usuario exista en la base de datos antes de acceder a sus propiedades
+    // Esto es vital para evitar errores si el usuario es nuevo o no tiene datos aún.
+    global.db.data.users = global.db.data.users || {}; // Asegura que 'users' existe
+    if (!global.db.data.users[userId]) {
+        global.db.data.users[userId] = {
+            exp: 0,
+            coin: 10,
+            joincount: 1,
+            diamond: 3,
+            lastadventure: 0,
+            lastclaim: 0,
+            health: 100,
+            crime: 0,
+            lastcofre: 0,
+            lastdiamantes: 0,
+            lastpago: 0,
+            lastcode: 0,
+            lastcodereg: 0,
+            lastduel: 0,
+            lastmining: 0,
+            muto: false,
+            premium: false,
+            premiumTime: 0,
+            registered: false,
+            genre: '',
+            birth: '',
+            marry: '',
+            description: '',
+            packstickers: null,
+            name: await conn.getName(userId), // Intentar obtener el nombre aquí
+            age: -1,
+            regTime: -1,
+            afk: -1,
+            afkReason: '',
+            role: 'Nuv',
+            banned: false,
+            useDocument: false,
+            level: 0,
+            bank: 0,
+            warn: 0,
+        };
+    }
+
+    let user = global.db.data.users[userId];
+    let name = await conn.getName(userId); // Obtener el nombre de visualización
     let cumpleanos = user.birth || 'No especificado';
     let genero = user.genre || 'No especificado';
     let pareja = user.marry || 'Nadie';
@@ -21,6 +72,8 @@ let handler = async (m, { conn, args }) => {
     let role = user.role || 'Sin Rango';
     let coins = user.coin || 0;
     let bankCoins = user.bank || 0;
+    
+    // Obtener foto de perfil
     let perfil = await conn.profilePictureUrl(userId, 'image').catch(_ => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg');
 
     let profileText = `
@@ -28,21 +81,21 @@ let handler = async (m, { conn, args }) => {
    
  ✎ *Dᥱsᥴrі⍴ᥴі᥆́ᥒ:* » ${description}
    
-╭──⪩ 𝐔𝐒𝐔𝐀𝐑𝐈𝑶 𝐏𝐑𝐄𝐌𝐈𝐔𝐌 ⪨
-┊❀ *N᥆mᑲrᥱ:* » @${userId.split('@')[0]}
-┊❖ *Eძᥲძ:* » ${user.age || 'Desconocida'}
+╭──⪩ \`INFORMACIÓN\` ⪨
+┊❀ *N᥆mᑲrᥱ:* » ${name}
+┊❖ *Eძᥲძ:* » ${user.age !== -1 ? user.age : 'Desconocida'}
 ┊❀ *Cᥙm⍴ᥣᥱᥲᥒ̃᥆s:* » ${cumpleanos}
 ┊⚥ *Gᥱᥒᥱr᥆:* » ${genero}
 ┊♡ *Cᥲsᥲძ@ con:* » ${pareja}
 ╰───⪨
 > ❁ *⍴rᥱmіᥙm* » ${user.premium ? '✅' : '❌'}
 ╰─────
-╭────⪩ 𝐑𝐄𝐂𝐔𝐑𝐒𝐎𝐒 ⪨
+╭────⪩ \`RECURSOS\` ⪨
 │◭ *E᥊⍴ᥱrіᥱᥴіᥲ:* » ${exp.toLocaleString()}
 │◭ *ᥒі᥎ᥱᥣ:* » ${nivel}
 │⚡︎ *Rᥲᥒg᥆:* » ${role}
-│⛁ *ᥴ᥆іᥒs ᥴᥲr𝗍ᥱrᥲ* » ${coins.toLocaleString()} ${moneda}
-│⛃ *ᥴ᥆іᥒs ᑲᥲᥒᥴ᥆* » ${bankCoins.toLocaleString()} ${moneda}
+│⛁ *ᥴ᥆іᥒs ᥴᥲr𝗍ᥱrᥲ* » ${coins.toLocaleString()} ${global.moneda || 'coins'}
+│⛃ *ᥴ᥆іᥒs ᑲᥲᥒᥴ᥆* » ${bankCoins.toLocaleString()} ${global.moneda || 'coins'}
 ┢───⪨ *𝓤𝓼𝓾𝓪𝓻𝓲𝓸 𝓓𝓮𝓼𝓽𝓪𝓬𝓪𝓭𝓸* ⪩ 
 > ✧ ⍴ᥲrᥲ ᥱძі𝗍ᥲr 𝗍ᥙ ⍴ᥱr𝖿іᥣ ᥙsᥲ *#perfildates*
 ╰────⪨
@@ -51,7 +104,7 @@ let handler = async (m, { conn, args }) => {
     await conn.sendMessage(m.chat, {
         image: { url: perfil },
         caption: profileText,
-        mentions: [userId],
+        mentions: [userId], // Asegura que el usuario sea mencionado en el mensaje
         buttons: [
             {
                 buttonId: '.perfildates',
@@ -69,4 +122,4 @@ handler.help = ['profile'];
 handler.tags = ['rg'];
 handler.command = ['profile', 'perfil'];
 
-export default handler; 
+export default handler;

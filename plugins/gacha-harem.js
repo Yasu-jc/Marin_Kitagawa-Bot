@@ -1,79 +1,133 @@
-import { promises as fs } from 'fs'
+import fs from 'fs/promises'
+import path from 'path'
+import { default as baileys, proto, generateWAMessageFromContent, prepareWAMessageMedia } from '@whiskeysockets/baileys'
+import axios from 'axios'
 
-const charactersFilePath = './src/database/characters.json'
-const haremFilePath = './src/database/harem.json'
+const charactersFilePath = path.resolve('./src/database/characters.json')
+
+let cachedCharacters = null
 
 async function loadCharacters() {
-    try {
-        const data = await fs.readFile(charactersFilePath, 'utf-8')
-        return JSON.parse(data)
-    } catch (error) {
-        throw new Error('❀ No se pudo cargar el archivo characters.json.')
-    }
+  if (cachedCharacters) {
+    return cachedCharacters
+  }
+  const json = await fs.readFile(charactersFilePath, 'utf-8')
+  cachedCharacters = JSON.parse(json)
+  return cachedCharacters
 }
 
-async function loadHarem() {
-    try {
-        const data = await fs.readFile(haremFilePath, 'utf-8')
-        return JSON.parse(data)
-    } catch (error) {
-        return []
-    }
+export function invalidateCharactersCache() {
+  cachedCharacters = null
 }
 
-let handler = async (m, { conn, args }) => {
-    try {
-        const characters = await loadCharacters()
-        const harem = await loadHarem()
-        let userId
+const handler = async (m, { conn, args }) => {
+  try {
 
-        if (m.quoted && m.quoted.sender) {
-            userId = m.quoted.sender
-        } else if (args[0] && args[0].startsWith('@')) {
-            userId = args[0].replace('@', '') + '@s.whatsapp.net'
-        } else {
-            userId = m.sender
-        }
+    await conn.reply(m.chat, '🩷 *Cargando harem...* por favor espera un momento.', m)
 
-        const userCharacters = characters.filter(character => character.user === userId)
 
-        if (userCharacters.length === 0) {
-            await conn.reply(m.chat, '❀ No tiene personajes reclamados en tu harem.', m)
-            return
-        }
+    const characters = await loadCharacters()
 
-        const page = parseInt(args[1]) || 1
-        const charactersPerPage = 50
-        const totalCharacters = userCharacters.length
-        const totalPages = Math.ceil(totalCharacters / charactersPerPage)
-        const startIndex = (page - 1) * charactersPerPage
-        const endIndex = Math.min(startIndex + charactersPerPage, totalCharacters)
+    let userId
+    if (m.quoted?.sender) userId = m.quoted.sender
+    else if (args[0]?.startsWith('@')) userId = args[0].replace('@', '') + '@s.whatsapp.net'
+    else userId = m.sender
 
-        if (page < 1 || page > totalPages) {
-            await conn.reply(m.chat, `❀ Página no válida. Hay un total de *${totalPages}* páginas.`, m)
-            return
-        }
+    const userChars = characters.filter(c => c.user === userId)
+    const totalCharacters = userChars.length
 
-        let message = `✿ Personajes reclamados ✿\n`
-        message += `⌦ Usuario: @${userId.split('@')[0]}\n`
-        message += `♡ Personajes: *(${totalCharacters}):*\n\n`
-
-        for (let i = startIndex; i < endIndex; i++) {
-            const character = userCharacters[i]
-            message += `» *${character.name}* (*${character.value}*)\n`
-        }
-
-        message += `\n> ⌦ _Página *${page}* de *${totalPages}*_`
-
-        await conn.reply(m.chat, message, m, { mentions: [userId] })
-    } catch (error) {
-        await conn.reply(m.chat, `✘ Error al cargar el harem: ${error.message}`, m)
+    if (!totalCharacters) {
+      throw new Error('❌ No tienes personajes reclamados.')
     }
+
+    const pageSize = 10
+    const requestedPage = parseInt(args[0]) || 1
+
+    if (requestedPage <= 0) {
+        throw new Error('❌ El número de página debe ser un valor positivo.')
+    }
+
+    const totalPages = Math.ceil(totalCharacters / pageSize)
+    if (requestedPage > totalPages && totalCharacters > 0) {
+        throw new Error(`❌ Solo hay ${totalPages} página(s) de personajes.`)
+    }
+
+    const startIndex = (requestedPage - 1) * pageSize
+    const endIndex = startIndex + pageSize
+
+    const displayChars = userChars.slice(startIndex, endIndex)
+
+    if (!displayChars.length) {
+        throw new Error('❌ No hay personajes para mostrar en esta página.')
+    }
+
+    const listedNames = userChars.map(c => `• ${c.name}`).join('\n').slice(0, 1500)
+    const carruselHeader = `✿ *Personajes reclamados* ✿\n` +
+                           `⌦ Usuario: @${userId.split('@')[0]}\n` +
+                           `♡ Personajes: *(${totalCharacters})* ${totalCharacters > pageSize ? `(Pág. ${requestedPage}/${totalPages})` : ''}:\n\n` +
+                           listedNames
+
+    const cards = []
+    const mediaResults = await Promise.allSettled(displayChars.map(async char => {
+      const imgUrl = Array.isArray(char.img) ? char.img[0] : char.img
+      if (!imgUrl) throw new Error('Sin imagen')
+
+      const res = await axios.get(imgUrl, { responseType: 'arraybuffer' })
+      const buffer = Buffer.from(res.data, 'binary')
+      const media = await prepareWAMessageMedia({ image: buffer }, { upload: conn.waUploadToServer })
+
+      return {
+        name: char.name,
+        value: char.value,
+        media
+      }
+    }))
+
+    for (let i = 0; i < mediaResults.length; i++) {
+      const result = mediaResults[i]
+      if (result.status === 'fulfilled') {
+        const { name, value, media } = result.value
+        cards.push({
+          body: proto.Message.InteractiveMessage.Body.fromObject({ text: name }),
+          footer: proto.Message.InteractiveMessage.Footer.fromObject({ text: `⭐ Valor: ${value}` }),
+          header: proto.Message.InteractiveMessage.Header.fromObject({
+            hasMediaAttachment: true,
+            title: name,
+            imageMessage: media.imageMessage
+          }),
+          nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({ buttons: [] })
+        })
+      } else {
+          console.warn(`[HAREM] Falló la descarga de imagen para un personaje: ${result.reason}`);
+      }
+    }
+
+    if (!cards.length) throw new Error('🚩 No hay imágenes válidas para mostrar en esta página.')
+
+    const message = generateWAMessageFromContent(
+      m.chat,
+      {
+        interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+          body: proto.Message.InteractiveMessage.Body.fromObject({ text: carruselHeader }),
+          footer: proto.Message.InteractiveMessage.Footer.fromObject({ text: '' }),
+          header: proto.Message.InteractiveMessage.Header.fromObject({ hasMediaAttachment: false }),
+          carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({ cards })
+        })
+      },
+      { quoted: m }
+    )
+
+    await conn.relayMessage(m.chat, message.message, { messageId: message.key.id })
+
+  } catch (e) {
+    console.error('[HAREM]', e)
+    await conn.reply(m.chat, `❌ Error al cargar el harem:\n${e.message}`, m)
+  }
 }
 
-handler.help = ['harem [@usuario] [pagina]']
+handler.command = ['harem']
 handler.tags = ['anime']
-handler.command = ['harem', 'claims', 'waifus']
+handler.help = ['harem [página]']
 handler.group = true
 
 export default handler

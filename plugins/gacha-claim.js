@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 const charactersFilePath = './src/database/characters.json';
 const cooldowns = {};
 
-// Cambia el cooldown a 3 segundos (3000 ms)
+
 const COOLDOWN_TIME = 3 * 1000;
 
 async function loadCharacters() {
@@ -11,7 +11,12 @@ async function loadCharacters() {
         const data = await fs.readFile(charactersFilePath, 'utf-8');
         return JSON.parse(data);
     } catch (error) {
-        throw new Error('❀ No se pudo cargar el archivo characters.json.');
+
+        if (error.code === 'ENOENT') { 
+            console.warn('El archivo characters.json no existe. Se creará uno nuevo al guardar.');
+            return []; 
+        }
+        throw new Error('❀ No se pudo cargar el archivo characters.json: ' + error.message);
     }
 }
 
@@ -19,7 +24,7 @@ async function saveCharacters(characters) {
     try {
         await fs.writeFile(charactersFilePath, JSON.stringify(characters, null, 2), 'utf-8');
     } catch (error) {
-        throw new Error('❀ No se pudo guardar el archivo characters.json.');
+        throw new Error('❀ No se pudo guardar el archivo characters.json: ' + error.message);
     }
 }
 
@@ -34,13 +39,18 @@ let handler = async (m, { conn }) => {
         return await conn.reply(m.chat, `《✧》Debes esperar *${minutes} minutos y ${seconds} segundos* para usar *#c* de nuevo.`, m);
     }
 
-    if (m.quoted && m.quoted.sender === conn.user.jid) {
+
+
+    if (m.quoted && m.quoted.text) {
+
+
         try {
             const characters = await loadCharacters();
+
             const characterIdMatch = m.quoted.text.match(/✦ ID: \*(.+?)\*/);
 
             if (!characterIdMatch) {
-                await conn.reply(m.chat, '《✧》No se pudo encontrar el ID del personaje en el mensaje citado.', m);
+                await conn.reply(m.chat, '《✧》No se pudo encontrar el ID del personaje en el mensaje citado. Asegúrate de que el mensaje tenga el formato "✦ ID: *[ID]*".', m);
                 return;
             }
 
@@ -48,7 +58,7 @@ let handler = async (m, { conn }) => {
             const character = characters.find(c => c.id === characterId);
 
             if (!character) {
-                await conn.reply(m.chat, '《✧》El mensaje citado no es un personaje válido.', m);
+                await conn.reply(m.chat, `《✧》El ID *${characterId}* no corresponde a un personaje válido en mi base de datos.`, m);
                 return;
             }
 
@@ -64,14 +74,14 @@ let handler = async (m, { conn }) => {
 
             await conn.reply(m.chat, `✦ Has reclamado a *${character.name}* con éxito.`, m);
 
-            // Cooldown de 3 segundos
+
             cooldowns[userId] = now + COOLDOWN_TIME;
         } catch (error) {
             await conn.reply(m.chat, `✘ Error al reclamar el personaje: ${error.message}`, m);
         }
 
     } else {
-        await conn.reply(m.chat, '《✧》Debes citar un personaje válido para reclamar.', m);
+        await conn.reply(m.chat, '《✧》Debes citar un mensaje válido para reclamar. Asegúrate de citar el mensaje que contiene el personaje con su ID.', m);
     }
 };
 
