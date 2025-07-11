@@ -5,6 +5,221 @@ import axios from "axios";
 const botname = typeof globalThis.botname === "string" ? globalThis.botname : "Marin-Bot ✨";
 const packname = typeof globalThis.packname === "string" ? globalThis.packname : "Marin-Bot";
 const dev = typeof globalThis.dev === "string" ? globalThis.dev : "Dev";
+const icono = typeof globalThis.icono === "string" ? globalThis.icono : "https://i.postimg.cc/NF8BtxYg/20250617-143039.jpg";
+
+const formatAudio = ["mp3", "m4a", "webm", "aac", "flac", "opus", "ogg", "wav"];
+const formatVideo = ["360", "480", "720", "1080", "1440", "4k"];
+
+async function cekProgress(id) {
+    const config = {
+        method: "GET",
+        url: `https://p.oceansaver.in/ajax/progress.php?id=${id}`,
+        headers: { "User-Agent": "Mozilla/5.0" }
+    };
+    while (true) {
+        try {
+            const response = await axios.request(config);
+            if (response.data?.success && response.data.progress === 1000) {
+                return response.data.download_url;
+            }
+            await new Promise(r => setTimeout(r, 200)); // Más rápido
+        } catch (error) {
+            throw error;
+        }
+    }
+}
+
+const ddownr = {
+    download: async (url, format) => {
+        const config = {
+            method: "GET",
+            url: `https://p.oceansaver.in/ajax/download.php?format=${format}&url=${encodeURIComponent(url)}&api=dfcb6d76f2f6a9894gjkege8a4ab232222`,
+            headers: { "User-Agent": "Mozilla/5.0" }
+        };
+        const response = await axios.request(config);
+        if (response.data?.success) {
+            const { id, title, info } = response.data;
+            const downloadUrl = await cekProgress(id);
+            return { id, title, image: info?.image, downloadUrl };
+        } else {
+            throw new Error("⛔ No se pudo obtener detalles del video");
+        }
+    }
+};
+
+async function formatViews(views) {
+    if (views == null) return "Desconocido";
+    if (typeof views === "string" && /^\d+$/.test(views)) views = Number(views);
+    if (!Number.isFinite(views)) return "Desconocido";
+    return views >= 1000
+        ? (views / 1000).toFixed(1) + "k (" + views.toLocaleString() + ")"
+        : String(views);
+}
+
+async function playAudio(conn, m, videoInfo) {
+    const { title, thumbnail, url, author } = videoInfo;
+    await m.react('🎧');
+
+    await conn.sendMessage(m.chat, {
+        text: `\`𖹭︩︪Descargando𖹭︩︪:\` ${title}\n> Espera un momento...`,
+        contextInfo: {
+            externalAdReply: {
+                title: "🎵 Audio en progreso",
+                body: `${author?.name || 'Desconocido'} - ${title}`,
+                thumbnailUrl: thumbnail || icono,
+                thumbnail: await (await fetch(thumbnail || icono)).buffer(),
+                mediaType: 1,
+                sourceUrl: url,
+                renderLargerThumbnail: false
+            }
+        }
+    }, { quoted: m });
+
+    try {
+        const result = await Promise.any(formatAudio.map(async (format) => {
+            const api = await ddownr.download(url, format);
+            if (!api?.downloadUrl) throw new Error(`Formato falló: ${format}`);
+            return { ...api, format };
+        }));
+
+        await conn.sendMessage(m.chat, {
+            audio: { url: result.downloadUrl },
+            mimetype: "audio/mpeg",
+            fileName: `${result.title || "audio"}.${result.format}`
+        }, { quoted: m });
+    } catch (e) {
+        await conn.reply(m.chat, "❌ No se pudo descargar el audio en ningún formato.", m);
+    }
+}
+
+async function play2Video(conn, m, videoInfo) {
+    const { title, thumbnail, url, author } = videoInfo;
+    await m.react('📥');
+
+    await conn.sendMessage(m.chat, {
+        text: `\`𖹭︩︪Descargando𖹭︩︪:\` ${title}`,
+        contextInfo: {
+            externalAdReply: {
+                title: "🎥 Video en progreso",
+                body: `${author?.name || 'Desconocido'} - ${title}`,
+                thumbnailUrl: thumbnail || icono,
+                thumbnail: await (await fetch(thumbnail || icono)).buffer(),
+                mediaType: 1,
+                sourceUrl: url,
+                renderLargerThumbnail: false
+            }
+        }
+    }, { quoted: m });
+
+    const sources = [
+        `https://api.siputzx.my.id/api/d/ytmp4?url=${url}`,
+        `https://api.zenkey.my.id/api/download/ytmp4?apikey=zenkey&url=${url}`,
+        `https://axeel.my.id/api/download/video?url=${encodeURIComponent(url)}`,
+        `https://delirius-apiofc.vercel.app/download/ytmp4?url=${url}`
+    ];
+
+    const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), ms));
+
+    try {
+        const downloadUrl = await Promise.any(
+            sources.map(source =>
+                Promise.race([
+                    fetch(source).then(res => res.json()),
+                    timeout(5000)
+                ]).then(data => {
+                    const link = data?.data?.dl || data?.result?.download?.url || data?.downloads?.url || data?.data?.download?.url;
+                    if (!link) throw new Error("Sin enlace");
+                    return link;
+                })
+            )
+        );
+
+        await conn.sendMessage(m.chat, {
+            video: { url: downloadUrl },
+            fileName: `${title}.mp4`,
+            mimetype: "video/mp4",
+            caption: `🎬 ${title}\n> ${packname} | ${dev}`
+        }, { quoted: m });
+    } catch (e) {
+        console.error("❌ Ninguna fuente de video respondió:", e.message);
+        await conn.reply(m.chat, "❌ No se pudo obtener un enlace válido de descarga.", m);
+    }
+}
+
+const handler = async (m, { conn, text, command, args }) => {
+    if (!text) return conn.reply(m.chat, "❗ Ingresa el nombre o enlace de YouTube", m);
+    const search = await yts(text.trim());
+    if (!search.all.length) return conn.reply(m.chat, "❌ No se encontraron resultados.", m);
+    const videoInfo = search.all[0];
+
+    switch (command) {
+        case "play":
+        case "p":
+        case "yta":
+        case "ytmp3":
+            return await playAudio(conn, m, videoInfo);
+
+        case "play2":
+        case "ytv":
+        case "ytmp4":
+            return await play2Video(conn, m, videoInfo);
+
+        default:
+            return;
+    }
+};
+
+handler.before = async (m, { conn }) => {
+    if (!m.text || m.isBaileys || m.fromMe) return false;
+    const text = m.text.trim().toLowerCase();
+
+    const directCommands = {
+        "play": "play",
+        "play2": "play2"
+    };
+
+    for (let key in directCommands) {
+        if (text === key) {
+            await handler(m, { conn, text: "", command: key, args: [] });
+            return true;
+        }
+        if (text.startsWith(`${key} `)) {
+            const q = text.slice(key.length).trim();
+            await handler(m, { conn, text: q, command: key, args: [q] });
+            return true;
+        }
+    }
+
+    return false;
+};
+
+handler.command = handler.help = ["play", "play2", "p", "yta", "ytmp3", "ytv", "ytmp4"];
+handler.tags = ["downloader"];
+handler.register = true;
+handler.limit = 1;
+
+export default handler;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*import fetch from "node-fetch";
+import yts from "yt-search";
+import axios from "axios";
+
+const botname = typeof globalThis.botname === "string" ? globalThis.botname : "Marin-Bot ✨";
+const packname = typeof globalThis.packname === "string" ? globalThis.packname : "Marin-Bot";
+const dev = typeof globalThis.dev === "string" ? globalThis.dev : "Dev";
 
 const icono = typeof globalThis.icono === "string" ? globalThis.icono : "https://i.postimg.cc/NF8BtxYg/20250617-143039.jpg";
 
@@ -345,4 +560,4 @@ handler.tags = ["downloader"];
 handler.register = true;
 handler.limit = 1;
 
-export default handler;
+export default handler;*/
