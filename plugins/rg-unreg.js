@@ -38,8 +38,7 @@ let handler = async (m, { conn, text }) => {
         body: "Tu información fue borrada.",
         mediaType: 1,
         thumbnailUrl: pp, // OBLIGATORIO para imagen grande
-        renderLargerThumbnail: true, // OBLIGATORIO para imagen grande
-        showAdAttribution: true,
+        renderLargerThumbnail: false, 
         previewType: "PHOTO", // Opcional
         sourceUrl: "https://wa.me/" + m.sender.split("@")[0] // Opcional, para mostrar el enlace
       }
