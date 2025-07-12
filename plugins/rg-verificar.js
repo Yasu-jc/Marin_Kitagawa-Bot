@@ -64,7 +64,6 @@ let handler = async function (m, { conn, text, usedPrefix, command, args }) {
         thumbnailUrl: pp, // Use the profile picture of the registering user
         sourceUrl: typeof channel !== 'undefined' ? channel : '', // Ensure 'channel' is defined if used
         mediaType: 1,
-        showAdAttribution: true,
         renderLargerThumbnail: true
       }
     }
