@@ -92,7 +92,6 @@ ${'```' + Object.keys(used).map((key, _, arr) => `${key.padEnd(Math.max(...arr.m
     contextInfo: {
       mentionedJid: [owner[0][0] + '@s.whatsapp.net'],
       externalAdReply: {
-        showAdAttribution: true,
         title: previewTitle,
         body: previewBody,
         description: previewDesc,
