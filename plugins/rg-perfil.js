@@ -70,7 +70,7 @@ let handler = async (m, { conn, args }) => {
         contextInfo: {
             mentionedJid: [userId],
             externalAdReply: {
-                title: `Perfil de ${name}`, // 
+                title: `${wm}`, // 
                 body: `Usuario registrado`, 
                 thumbnailUrl: perfil, 
                 sourceUrl: 'https://wa.me/' + userId.split('@')[0], 
