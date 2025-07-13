@@ -19,7 +19,7 @@ let handler = async (m, { conn }) => {
 
     const owner2 = {
         name: '𝔯𝔲𝔦𝔷 𝔇𝔬𝔪𝔦𝔫𝔞😈👺',
-        number: '526636700428',
+        number: '526646951773',
         email: 'X',
         github: 'X',
         region: 'México'
