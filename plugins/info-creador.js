@@ -30,7 +30,7 @@ BEGIN:VCARD
 VERSION:3.0
 FN:${owner.name}
 item1.TEL;waid=${owner.number}:${owner.number}
-item1.X-ABLabel:Número
+item1.X-ABLabel:Propietario de ${wm}
 ${owner.email !== "x" ? `item2.EMAIL;type=INTERNET:${owner.email}\nitem2.X-ABLabel:Email` : ''}
 item3.URL:${owner.github}
 item3.X-ABLabel:GitHub
