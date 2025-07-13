@@ -5,6 +5,101 @@ import fetch from 'node-fetch';
 let handler = async (m, { conn, args }) => {
     let userId;
 
+    if (m.mentionedJid && m.mentionedJid[0]) {
+        userId = m.mentionedJid[0];
+    } else if (m.quoted && m.quoted.sender) {
+        userId = m.quoted.sender;
+    } else {
+        userId = m.sender;
+    }
+
+    global.db.data.users = global.db.data.users || {};
+    if (!global.db.data.users[userId]) {
+        global.db.data.users[userId] = {
+            exp: 0, coin: 10, joincount: 1, diamond: 3, lastadventure: 0, lastclaim: 0,
+            health: 100, crime: 0, lastcofre: 0, lastdiamantes: 0, lastpago: 0,
+            lastcode: 0, lastcodereg: 0, lastduel: 0, lastmining: 0, muto: false,
+            premium: false, premiumTime: 0, registered: false, genre: '', birth: '',
+            marry: '', description: '', packstickers: null, name: await conn.getName(userId),
+            age: -1, regTime: -1, afk: -1, afkReason: '', role: 'Nuv', banned: false,
+            useDocument: false, level: 0, bank: 0, warn: 0,
+        };
+    }
+
+    let user = global.db.data.users[userId];
+    let name = await conn.getName(userId);
+    let cumpleanos = user.birth || 'No especificado';
+    let genero = user.genre || 'No especificado';
+    let pareja = user.marry || 'Nadie';
+    let description = user.description || 'Sin Descripción';
+    let exp = user.exp || 0;
+    let nivel = user.level || 0;
+    let role = user.role || 'Sin Rango';
+    let coins = user.coin || 0;
+    let bankCoins = user.bank || 0;
+
+    let perfil = await conn.profilePictureUrl(userId, 'image').catch(_ => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg');
+
+    let profileText = `
+「 𖤘 *Perfil De Usuario* 」 『@${userId.split('@')[0]}』
+
+✎ *Descripción:* » ${description}
+
+╭──⪩ \`INFORMACIÓN\` ⪨
+┊❀ *Nombre:* » ${name}
+┊❖ *Edad:* » ${user.age !== -1 ? user.age : 'Desconocida'}
+┊❀ *Cumpleaños:* » ${cumpleanos}
+┊⚥ *Género:* » ${genero}
+┊♡ *Casad@ con:* » ${pareja}
+╰───⪨
+> ❁ *Premium* » ${user.premium ? '✅' : '❌'}
+
+╭────⪩ \`RECURSOS\` ⪨
+│◭ *Experiencia:* » ${exp.toLocaleString()}
+│◭ *Nivel:* » ${nivel}
+│⚡︎ *Rango:* » ${role}
+│⛁ *Coins Cartera:* » ${coins.toLocaleString()} ${global.moneda || 'coins'}
+│⛃ *Coins Banco:* » ${bankCoins.toLocaleString()} ${global.moneda || 'coins'}
+╰────⪨
+`.trim();
+
+    
+    await conn.sendMessage(m.chat, {
+        text: profileText, 
+        mentions: [userId],
+        contextInfo: {
+            mentionedJid: [userId],
+            externalAdReply: {
+                title: `Perfil de ${name}`, // 
+                body: `Usuario registrado`, 
+                thumbnailUrl: perfil, 
+                sourceUrl: 'https://wa.me/' + userId.split('@')[0], 
+                mediaType: 1, 
+                renderLargerThumbnail: true, 
+            }
+        }
+    }, { quoted: m });
+};
+
+handler.help = ['profile'];
+handler.tags = ['rg'];
+handler.command = ['profile', 'perfil'];
+
+export default handler;
+
+
+
+
+
+
+
+/*import moment from 'moment-timezone';
+import PhoneNumber from 'awesome-phonenumber';
+import fetch from 'node-fetch';
+
+let handler = async (m, { conn, args }) => {
+    let userId;
+
     // 1. Intentar con mención directa (ej: @usuario)
     if (m.mentionedJid && m.mentionedJid[0]) {
         userId = m.mentionedJid[0];
@@ -122,4 +217,4 @@ handler.help = ['profile'];
 handler.tags = ['rg'];
 handler.command = ['profile', 'perfil'];
 
-export default handler;
+export default handler;*/
