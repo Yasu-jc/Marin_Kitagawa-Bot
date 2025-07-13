@@ -1,4 +1,56 @@
-let handler = async(m, { conn, usedPrefix, command }) => {
+let handler = async (m, { conn, usedPrefix, args }) => {
+
+  let imageLink = (args[0] && args[0].startsWith('http')) 
+    ? args[0] 
+    : 'https://i.postimg.cc/MKRf37Mq/5e6a5ff29be47abef38634236b95e8e1.jpg';
+
+  let txt = `
+╭ - - - - - - -✎ 🌹   ❜ ⊹
+*︵₊˚꒰Ꮺ 𝗠𝗮𝗻𝘂𝗮𝗹 𝗽𝗮𝗿𝗮 𝗲𝗱𝗶𝘁𝗮𝗿 𝘁𝘂 𝗽𝗲𝗿𝗳𝗶𝗹*
+*꒰ ୨⚔️୧─・┈・୨⚡୧・┈・─୨⚔️୧ ꒱*
+₊˚୨🍧 *${usedPrefix}setbirth:*
+> Edita tu fecha de cumpleaños  
+₊˚୨💥 *${usedPrefix}delbirth:*
+> Elimina tu fecha de cumpleaños  
+₊˚୨⚔️ *${usedPrefix}setdesc:*
+> Edita tu descripción  
+₊˚୨🍁 *${usedPrefix}deldesc:*
+> Elimina tu descripción  
+₊˚୨🌲 *${usedPrefix}setgenre:* 
+> Edita tu género  
+₊˚୨🏜️ *${usedPrefix}delgenre:*
+> Elimina tu género  
+₊˚୨❄️ *${usedPrefix}marry:*
+> Cásate con alguien  
+₊˚୨🍥 *${usedPrefix}divorce:*
+> Divórciate  
+٭꒷꒦ ✨︶︶︶︶︶︶︶︶︶︶ 🔥꒦꒷٭`;
+
+  await conn.sendMessage(m.chat, {
+    text: txt,
+    contextInfo: {
+      mentionedJid: [m.sender],
+      externalAdReply: {
+        title: `${wm}`,
+        body: 'Configura tu perfil como desees',
+        thumbnailUrl: imageLink, 
+        sourceUrl: imageLink,    
+        mediaType: 1,
+        renderLargerThumbnail: true,
+      }
+    }
+  }, { quoted: m });
+};
+
+handler.command = ['perfildates', 'pedates', 'perd'];
+export default handler;
+
+
+
+
+
+
+/*let handler = async(m, { conn, usedPrefix, command }) => {
 
 let profilePic
 try {
@@ -46,4 +98,4 @@ await conn.sendMessage(
 handler.command = ['perfildates', 'pedates', 'perd'];
 handler.tag = ['rg'];
 handler.help = ['perfildates'];
-export default handler;
+export default handler;*/
