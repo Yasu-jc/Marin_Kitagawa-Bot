@@ -1,4 +1,108 @@
-import fetch from 'node-fetch'
+import fetch from 'node-fetch';
+
+// ✅ Función que descarga con la API tikwm
+async function tiktokdl(url) {
+  const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`;
+  const response = await (await fetch(apiUrl)).json();
+  return response;
+}
+
+const handler = async (m, { conn }) => {
+  const regexTT = /(?:https?:\/\/)?(?:www\.)?(tiktok\.com|vm\.tiktok\.com)\/[^\s]+/i;
+  const link = m.text?.trim();
+
+  if (!regexTT.test(link)) return;
+
+  try {
+    await m.react('🕒');
+    await conn.reply(m.chat, '♡ *Espere un momento, estoy descargando su video de TikTok...*', m, {
+      contextInfo: {
+        externalAdReply: {
+          mediaUrl: null,
+          mediaType: 1,
+          title: `${wm}`,
+          body: `${etiqueta}`,
+          previewType: 0,
+          thumbnail: await (await fetch('https://i.postimg.cc/nzRKNjVR/catalogo.jpg')).buffer(),
+          sourceUrl: 'https://tiktok.com'
+        }
+      }
+    });
+
+    const tiktokData = await tiktokdl(link);
+
+    if (!tiktokData || !tiktokData.data) {
+      await m.react('❌');
+      return conn.reply(m.chat, '❌ Error: No se pudo obtener información del video.', m);
+    }
+
+    const {
+      play: videoURL,
+      wmplay: videoURLWatermark,
+      title,
+      create_time,
+      digg_count,
+      comment_count,
+      share_count,
+      play_count,
+      download_count,
+      author,
+      music
+    } = tiktokData.data;
+
+const info = `
+˚ʚ꒰ ${botname} ꒱ɞ˚ 🍥
+・┄┄┄┄・♡・┄┄┄┄・
+🍨 ∿ ˚. ୭
+﹔♡﹒ Descripción: ${title}
+
+﹔♡﹒ Publicado: ${create_time}
+・┄┄┄┄・♡・┄┄┄┄・
+
+﹔♡﹒ Estado:
+> ❤️ Likes = ${digg_count}
+> 💬 Comentarios = ${comment_count}
+> 🔄 Compartidas = ${share_count}
+> 👀 Vistas = ${play_count}
+> ⬇️ Descargas = ${download_count}
+
+・┄┄┄┄・♡・┄┄┄┄・
+Uploader: ${author.nickname || "No info"}
+(${author.unique_id} - https://www.tiktok.com/@${author.unique_id})
+
+🔊 Sonido: ${music}
+
+🧷:  ૮꒰ ˶• ༝ •˶꒱ა ♡
+`;
+
+    if (videoURL || videoURLWatermark) {
+      await conn.sendFile(m.chat, videoURL, 'tiktok.mp4', '`DESCARGA DE TIKTOK`\n\n' + info, m);
+      await m.react('✅');
+    } else {
+      throw new Error('❌ No se encontró el video.');
+    }
+
+  } catch (error) {
+    console.error(error);
+    await m.react('⚠️');
+    return conn.reply(m.chat, `⚠️ Ocurrió un error al descargar el video.\n\n${error.message}`, m);
+  }
+};
+
+// 🔁 Auto detección de TikTok sin comando
+handler.customPrefix = /(?:https?:\/\/)?(?:www\.)?(tiktok\.com|vm\.tiktok\.com)\/[^\s]+/i;
+handler.command = new RegExp();
+handler.register = true;
+handler.group = false;
+
+export default handler;
+
+
+
+
+
+
+/*import fetch from 'node-fetch'
 
 var handler = async (m, { conn, args, usedPrefix, command }) => {
     if (!args[0]) {
@@ -46,4 +150,4 @@ async function tiktokdl(url) {
     let tikwm = `https://www.tikwm.com/api/?url=${url}?hd=1`
     let response = await (await fetch(tikwm)).json()
     return response
-}
+}*/
