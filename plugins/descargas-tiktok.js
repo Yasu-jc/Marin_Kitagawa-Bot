@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-// ✅ Función que descarga con la API tikwm
+
 async function tiktokdl(url) {
   const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`;
   const response = await (await fetch(apiUrl)).json();
@@ -89,7 +89,7 @@ Uploader: ${author.nickname || "No info"}
   }
 };
 
-// 🔁 Auto detección de TikTok sin comando
+
 handler.customPrefix = /(?:https?:\/\/)?(?:www\.)?(tiktok\.com|vm\.tiktok\.com)\/[^\s]+/i;
 handler.command = new RegExp();
 handler.register = true;
