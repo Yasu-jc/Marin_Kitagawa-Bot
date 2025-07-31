@@ -4,11 +4,11 @@ let handler = async (m, { conn, saludo, wm, vs }) => {
     let uptime = clockString(_uptime);
     let totalreg = Object.keys(global.db.data.users).length;
 
-    let botname = global.botname || `${wm}`;
-    let dev = global.dev || `${etiqueta}`;
-    let redes = global.redes || "";
+    let botname = global.botname || "NombreBot";
+    let dev = global.dev || "Mi Dev";
+    let redes = global.redes || "https://tucanal.com";
 
-    
+    // URL de las imágenes que deseas usar
     const imageUrls = [
         'https://i.postimg.cc/jSspP71S/3032506dc811a81f05e027329aeda39e.jpg',
         'https://i.postimg.cc/sD9FMcwL/6f49853a6d5295cb715428e9f2a1b4f1.jpg',
@@ -343,7 +343,6 @@ let handler = async (m, { conn, saludo, wm, vs }) => {
             externalAdReply: {
                 title: `${global.wm}`,
                 body: `${dev}`,
-                thumbnailUrl: 'https://i.postimg.cc/Kv7Lcf7c/4581d7b3704643d9378eac636d9d394e.jpg',
                 sourceUrl: redes,
                 mediaType: 1,
                 renderLargerThumbnail: false,
@@ -363,6 +362,7 @@ function clockString(ms) {
     let s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60;
     return [h, m, s].map(v => v.toString().padStart(2, 0)).join(':');
 }
+
 
 
 
