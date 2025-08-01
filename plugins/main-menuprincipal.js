@@ -342,7 +342,7 @@ await conn.sendMessage(m.chat, {
                 body: `${dev}`,
                 mediaUrl: redes,
                 sourceUrl: redes,
-                thumbnail: await (await fetch(banner)).buffer(),
+                thumbnail: imageUrls,
                 mediaType: 1,
                 renderLargerThumbnail: true,
             }
