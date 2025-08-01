@@ -7,15 +7,13 @@ let handler = async (m, { conn, saludo, wm, vs }) => {
     let dev = global.dev || "Mi Dev";
     let redes = global.redes || "https://tucanal.com";
     
-    // Lista de URLs de imágenes para la vista previa
+
     const imageUrls = [
-        'https://i.imgur.com/e5B0rA4.jpg',
-        'https://i.imgur.com/2sA8JkM.png',
-        'https://i.imgur.com/lD2rLqG.jpg',
-        'https://i.imgur.com/gK98n3z.jpg'
+        'https://i.postimg.cc/jSspP71S/3032506dc811a81f05e027329aeda39e.jpg',
+        'https://i.postimg.cc/sD9FMcwL/6f49853a6d5295cb715428e9f2a1b4f1.jpg',
     ];
 
-    // Selecciona una URL de imagen aleatoria de la lista
+    
     const randomImage = imageUrls[Math.floor(Math.random() * imageUrls.length)];
     
 let txt = `
