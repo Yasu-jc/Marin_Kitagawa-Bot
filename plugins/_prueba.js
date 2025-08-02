@@ -1,101 +1,183 @@
-import fetch from 'node-fetch';
+import fetch from "node-fetch"
+import yts from "yt-search"
+import axios from "axios"
 
-const SEARCH_APIS = [
-  { name: 'Servidor Masha', url: 'http://api.alyabot.xyz:3269/search_youtube?query=' },
-  { name: 'Servidor Alya', url: 'http://api2.alyabot.xyz:3108/search_youtube?query=' },
-  { name: 'Servidor Masachika', url: 'https://api3.alyabot.xyz/search_youtube?query=' }
-];
-
-const DOWNLOAD_APIS = [
+const AUDIO_APIS = [
   { name: 'Servidor Masha', url: 'http://api.alyabot.xyz:3269/download_audioV2?url=' },
   { name: 'Servidor Alya', url: 'http://api2.alyabot.xyz:3108/download_audioV2?url=' },
   { name: 'Servidor Masachika', url: 'https://api3.alyabot.xyz/download_audioV2?url=' }
-];
+]
 
-// Utilidad para probar múltiples endpoints
-async function tryFetchJSON(servers, query) {
-  for (let server of servers) {
+const tryFetchAudio = async (url) => {
+  for (let api of AUDIO_APIS) {
     try {
-      const res = await fetch(server.url + encodeURIComponent(query));
-      if (!res.ok) continue;
+      const res = await fetch(api.url + encodeURIComponent(url));
       const json = await res.json();
-      if (json && Object.keys(json).length) return { json, serverName: server.name };
-    } catch {
-      continue;
-    }
+      if (json?.file_url) return { ...json, server: api.name };
+    } catch (e) { continue; }
   }
-  return { json: null, serverName: null };
-}
+  return null;
+};
 
-const handler = async (m, { text, conn }) => {
-  if (!text) {
-    return m.reply('🔍 Ingresa el nombre de una canción o el link de un video.\n\nEjemplo: *.play Yamete kudasai*');
+const handler = async (m, { conn, text, usedPrefix, command }) => {
+  await m.react('🔍')
+
+  if (!text.trim()) {
+    return conn.reply(m.chat, `✏️ Escribe el nombre de la canción o envía un enlace de YouTube.`, m);
   }
 
   try {
-    await m.react('🔎');
-
-    const { json: searchJson, serverName: searchServer } = await tryFetchJSON(SEARCH_APIS, text);
-    if (!searchJson?.results?.length) {
-      return m.reply('⚠️ No se encontraron resultados. Intenta con otro título.');
+    const search = await yts(text)
+    if (!search.all.length) {
+      return m.reply(`❌ No encontré nada con ese nombre...`)
     }
 
-    const video = searchJson.results[0];
-    const title = video.title;
-    const url = video.url;
-    const duration = Math.floor(video.duration);
-    const views = video.views?.toLocaleString() || 'N/A';
-    const channel = video.channel;
-    const thumbnail = video.thumbnails.find(t => t.width === 720)?.url || video.thumbnails[0]?.url;
+    const videoInfo = search.all[0]
+    const { title, thumbnail, timestamp, views, ago, url } = videoInfo
+    const thumb = (await conn.getFile(thumbnail))?.data
+    const type = ["play2", "ytv", "ytmp4"].includes(command) ? "video" : "audio"
+    const vistas = formatViews(views)
 
-    const info = `
-┏• ゜✧・゜・゜⌬ ${botname} ⌬・゜・゜✧°・┓
-> ·˚ · ͟͟͞͞꒰➳ *Título:* ${title}
-> ·˚ · ͟͟͞͞꒰➳ *Duración:* ${timestamp || "?"}
-> ·˚ · ͟͟͞͞꒰➳ *Vistas:* ${vistas}
-> ·˚ · ͟͟͞͞꒰➳ *Hace:* ${ago}
-┗・゜✧・゜・゜⌬ ${vs} ⌬・゜・゜✧・┛
+    const infoMessage = `
+┏• ゜✧⌬ AlyaBot ⌬✧°・┓
+> 🎵 *Título:* ${title}
+> ⏱️ *Duración:* ${timestamp || "?"}
+> 👁️ *Vistas:* ${vistas}
+> 🕓 *Hace:* ${ago}
+┗•゜⌬ Servidor: ${type === 'audio' ? 'AlyaBot API' : 'Multi-source'} ⌬•┛
 `.trim();
 
     await conn.sendMessage(m.chat, {
-      image: { url: thumbnail },
-      caption: info
-    }, { quoted: m });
-
-    await m.react('🎧');
-
-    const { json: downloadJson } = await tryFetchJSON(DOWNLOAD_APIS, url);
-    if (!downloadJson?.file_url) {
-      return m.reply('❌ No se pudo descargar el audio. Intenta más tarde.');
-    }
-
-    return await conn.sendMessage(m.chat, {
-      audio: { url: downloadJson.file_url },
-      mimetype: 'audio/mp4',
-      fileName: `${downloadJson.title || title}.mp3`,
+      text: infoMessage,
       contextInfo: {
         externalAdReply: {
-          title: '🎧 Tu canción está lista',
-          body: `${global.packname || ''} | ${global.dev || ''}`,
+          title: "🔎 Resultado",
+          body: "Descargando...",
           thumbnailUrl: thumbnail,
+          thumbnail: thumb,
           mediaType: 1,
           sourceUrl: url,
-          renderLargerThumbnail: true
+          renderLargerThumbnail: false
         }
       }
-    }, { quoted: m });
+    }, { quoted: m })
 
-  } catch (e) {
-    console.error('Error en handler AlyaBot:', e);
-    return m.reply('❌ Hubo un error al procesar tu solicitud.');
+    // 🔊 AUDIO con AlyaBot API
+    if (type === "audio") {
+      const result = await tryFetchAudio(url)
+      if (!result) return m.reply("❌ No pude descargar el audio desde AlyaBot.")
+
+      return await conn.sendMessage(m.chat, {
+        audio: { url: result.file_url },
+        mimetype: 'audio/mpeg',
+        fileName: `${result.title || "audio"}.mp3`,
+        contextInfo: {
+          externalAdReply: {
+            title: `🎧 Aquí tienes tu canción`,
+            body: `${packname || 'AlyaBot'} | ${dev || ''}`,
+            thumbnailUrl: `https://i.postimg.cc/NF8BtxYg/20250617-143039.jpg`,
+            thumbnail: thumb,
+            mediaType: 1,
+            sourceUrl: url,
+            renderLargerThumbnail: true
+          }
+        }
+      }, { quoted: m })
+    }
+
+    // 📹 VIDEO con múltiples APIs externas
+    if (type === "video") {
+      const sources = [
+        `https://api.zenkey.my.id/api/download/ytmp4?apikey=zenkey&url=${url}`,
+        `https://api.siputzx.my.id/api/d/ytmp4?url=${url}`,
+        `https://axeel.my.id/api/download/video?url=${encodeURIComponent(url)}`,
+        `https://delirius-apiofc.vercel.app/download/ytmp4?url=${url}`
+      ]
+
+      const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), ms))
+
+      try {
+        const downloadUrl = await Promise.any(
+          sources.map(source =>
+            Promise.race([
+              fetch(source).then(res => res.json()),
+              timeout(6000)
+            ]).then(data => {
+              const link = data?.data?.dl || data?.result?.download?.url || data?.downloads?.url || data?.data?.download?.url
+              if (!link) throw new Error("Sin enlace")
+              return link
+            })
+          )
+        )
+
+        return await conn.sendMessage(m.chat, {
+          video: { url: downloadUrl },
+          fileName: `${title}.mp4`,
+          mimetype: "video/mp4",
+          caption: `${title}`,
+          thumbnail: thumb,
+          contextInfo: {
+            externalAdReply: {
+              title: "🎬 Tu video está listo",
+              body: "Descargado por AlyaBot",
+              thumbnailUrl: `https://i.postimg.cc/NF8BtxYg/20250617-143039.jpg`,
+              sourceUrl: url,
+              mediaType: 1,
+              renderLargerThumbnail: false
+            }
+          }
+        }, { quoted: m })
+
+      } catch (e) {
+        console.error("❌ Descarga fallida:", e.message)
+        return m.reply("❌ No encontré un enlace válido para descargar tu video.")
+      }
+    }
+
+  } catch (err) {
+    console.error("❌ Error:", err)
+    return m.reply(`⚠️ Ocurrió un error: ${err.message}`)
   }
+}
+
+handler.command = handler.help = ["play", "play2", "ytmp3", "yta", "ytmp4", "ytv"]
+handler.tags = ["downloader"]
+handler.register = true
+
+// ↪️ Manejo automático para comandos cortos
+handler.before = async (m, { conn }) => {
+  if (!m.text || m.isBaileys || m.fromMe) return false;
+  const text = m.text.trim().toLowerCase();
+  const directCommands = { "play": "play", "play2": "play2" };
+
+  for (let key in directCommands) {
+    if (text === key || text.startsWith(`${key} `)) {
+      const q = text.slice(key.length).trim();
+      await handler(m, { conn, text: q, command: key, args: [q] });
+      return true;
+    }
+  }
+
+  return false;
 };
 
-handler.command = ['play', 'ytmp3', 'playmp3'];
-handler.help = ['play <canción o link>'];
-handler.tags = ['downloader'];
+// Utilidad para vistas abreviadas
+function formatViews(views) {
+  if (typeof views !== "number" || isNaN(views)) return "Desconocido"
+  const abs = Math.abs(views)
+  let short = ""
 
-export default handler;
+  if (abs >= 1e12) short = (views / 1e12).toFixed(1) + 'T'
+  else if (abs >= 1e9) short = (views / 1e9).toFixed(1) + 'B'
+  else if (abs >= 1e6) short = (views / 1e6).toFixed(1) + 'M'
+  else if (abs >= 1e3) short = (views / 1e3).toFixed(1) + 'k'
+  else short = views.toString()
+
+  const full = views.toLocaleString("es-ES")
+  return `${short} (${full})`
+}
+
+export default handler
 
 
 
