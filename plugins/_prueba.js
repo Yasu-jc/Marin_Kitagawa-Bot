@@ -74,7 +74,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         contextInfo: {
           externalAdReply: {
             title: `🎧 ᴀǫᴜɪ ᴛɪᴇɴᴇs ≧◔◡◔≦`,
-            body: `{wm}`,
+            body: `${wm}`,
             thumbnailUrl: `https://i.postimg.cc/NF8BtxYg/20250617-143039.jpg`,
             thumbnail: thumb,
             mediaType: 1,
