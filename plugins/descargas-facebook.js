@@ -57,7 +57,6 @@ const handler = async (m, { conn }) => {
         externalAdReply: {
           mediaUrl: null, 
           mediaType: 1,   
-          showAdAttribution: true,
           title: packname,
           body: dev,
           previewType: 0, 
