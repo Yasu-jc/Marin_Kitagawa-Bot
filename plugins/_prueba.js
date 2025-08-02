@@ -49,15 +49,12 @@ const handler = async (m, { text, conn }) => {
     const thumbnail = video.thumbnails.find(t => t.width === 720)?.url || video.thumbnails[0]?.url;
 
     const info = `
-╭─⃝🌸⃝─⃝❀⃝─〔 彡 AlyaBot 彡 〕─⃝❀⃝─⃝🌸⃝─╮
-│ 💿 Título: ${title}
-│ ⏱️ Duración: ${duration}s
-│ 👀 Vistas: ${views}
-│ 🎤 Autor: ${channel}
-│ 🔗 Link: ${url}
-│ 📡 Servidor: ${searchServer || 'Desconocido'}-nyan~ 🐾
-╰─⃝🌸⃝─〔 Enviando con amor 〕─⃝🌸⃝─╯
-> Hecho con amor por ${global.dev || 'Mi creador'}
+┏• ゜✧・゜・゜⌬ ${botname} ⌬・゜・゜✧°・┓
+> ·˚ · ͟͟͞͞꒰➳ *Título:* ${title}
+> ·˚ · ͟͟͞͞꒰➳ *Duración:* ${timestamp || "?"}
+> ·˚ · ͟͟͞͞꒰➳ *Vistas:* ${vistas}
+> ·˚ · ͟͟͞͞꒰➳ *Hace:* ${ago}
+┗・゜✧・゜・゜⌬ ${vs} ⌬・゜・゜✧・┛
 `.trim();
 
     await conn.sendMessage(m.chat, {
