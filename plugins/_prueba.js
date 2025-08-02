@@ -1,4 +1,115 @@
-import fetch from "node-fetch"
+import fetch from 'node-fetch';
+
+const SEARCH_APIS = [
+  { name: 'Servidor Masha', url: 'http://api.alyabot.xyz:3269/search_youtube?query=' },
+  { name: 'Servidor Alya', url: 'http://api2.alyabot.xyz:3108/search_youtube?query=' },
+  { name: 'Servidor Masachika', url: 'https://api3.alyabot.xyz/search_youtube?query=' }
+];
+
+const DOWNLOAD_APIS = [
+  { name: 'Servidor Masha', url: 'http://api.alyabot.xyz:3269/download_audioV2?url=' },
+  { name: 'Servidor Alya', url: 'http://api2.alyabot.xyz:3108/download_audioV2?url=' },
+  { name: 'Servidor Masachika', url: 'https://api3.alyabot.xyz/download_audioV2?url=' }
+];
+
+// Utilidad para probar múltiples endpoints
+async function tryFetchJSON(servers, query) {
+  for (let server of servers) {
+    try {
+      const res = await fetch(server.url + encodeURIComponent(query));
+      if (!res.ok) continue;
+      const json = await res.json();
+      if (json && Object.keys(json).length) return { json, serverName: server.name };
+    } catch {
+      continue;
+    }
+  }
+  return { json: null, serverName: null };
+}
+
+const handler = async (m, { text, conn }) => {
+  if (!text) {
+    return m.reply('🔍 Ingresa el nombre de una canción o el link de un video.\n\nEjemplo: *.play Yamete kudasai*');
+  }
+
+  try {
+    await m.react('🔎');
+
+    const { json: searchJson, serverName: searchServer } = await tryFetchJSON(SEARCH_APIS, text);
+    if (!searchJson?.results?.length) {
+      return m.reply('⚠️ No se encontraron resultados. Intenta con otro título.');
+    }
+
+    const video = searchJson.results[0];
+    const title = video.title;
+    const url = video.url;
+    const duration = Math.floor(video.duration);
+    const views = video.views?.toLocaleString() || 'N/A';
+    const channel = video.channel;
+    const thumbnail = video.thumbnails.find(t => t.width === 720)?.url || video.thumbnails[0]?.url;
+
+    const info = `
+┏• ゜✧・゜・゜⌬ ${botname} ⌬・゜・゜✧°・┓
+> ·˚ · ͟͟͞͞꒰➳ *Título:* ${title}
+> ·˚ · ͟͟͞͞꒰➳ *Duración:* ${timestamp || "?"}
+> ·˚ · ͟͟͞͞꒰➳ *Vistas:* ${vistas}
+> ·˚ · ͟͟͞͞꒰➳ *Hace:* ${ago}
+┗・゜✧・゜・゜⌬ ${vs} ⌬・゜・゜✧・┛
+`
+
+    await conn.sendMessage(m.chat, {
+      image: { url: thumbnail },
+      caption: info
+    }, { quoted: m });
+
+    await m.react('🎧');
+
+    const { json: downloadJson } = await tryFetchJSON(DOWNLOAD_APIS, url);
+    if (!downloadJson?.file_url) {
+      return m.reply('❌ No se pudo descargar el audio. Intenta más tarde.');
+    }
+
+    return await conn.sendMessage(m.chat, {
+      audio: { url: downloadJson.file_url },
+      mimetype: 'audio/mp4',
+      fileName: `${downloadJson.title || title}.mp3`,
+      contextInfo: {
+        externalAdReply: {
+          title: '🎧 Tu canción está lista',
+          body: `${global.packname || ''} | ${global.dev || ''}`,
+          thumbnailUrl: thumbnail,
+          mediaType: 1,
+          sourceUrl: url,
+          renderLargerThumbnail: true
+        }
+      }
+    }, { quoted: m });
+
+  } catch (e) {
+    console.error('Error en handler AlyaBot:', e);
+    return m.reply('❌ Hubo un error al procesar tu solicitud.');
+  }
+};
+
+handler.command = ['play', 'ytmp3', 'playmp3'];
+handler.help = ['play <canción o link>'];
+handler.tags = ['downloader'];
+
+export default handler;
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*import fetch from "node-fetch"
 import yts from "yt-search"
 import axios from "axios"
 
@@ -218,7 +329,7 @@ function formatViews(views) {
 
   const full = views.toLocaleString("es-ES")
   return `${short} (${full})`
-}
+}*/
 
 
 
