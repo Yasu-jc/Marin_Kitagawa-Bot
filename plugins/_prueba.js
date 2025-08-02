@@ -39,12 +39,12 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const vistas = formatViews(views)
 
     const infoMessage = `
-┏• ゜✧⌬ AlyaBot ⌬✧°・┓
-> 🎵 *Título:* ${title}
-> ⏱️ *Duración:* ${timestamp || "?"}
-> 👁️ *Vistas:* ${vistas}
-> 🕓 *Hace:* ${ago}
-┗•゜⌬ Servidor: ${type === 'audio' ? 'AlyaBot API' : 'Multi-source'} ⌬•┛
+┏• ゜✧・゜・゜⌬ ${botname} ⌬・゜・゜✧°・┓
+> ·˚ · ͟͟͞͞꒰➳ *Título:* ${title}
+> ·˚ · ͟͟͞͞꒰➳ *Duración:* ${timestamp || "?"}
+> ·˚ · ͟͟͞͞꒰➳ *Vistas:* ${vistas}
+> ·˚ · ͟͟͞͞꒰➳ *Hace:* ${ago}
+┗・゜✧・゜・゜⌬ ${vs} ⌬・゜・゜✧・┛
 `.trim();
 
     await conn.sendMessage(m.chat, {
@@ -62,10 +62,10 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       }
     }, { quoted: m })
 
-    // 🔊 AUDIO con AlyaBot API
+    
     if (type === "audio") {
       const result = await tryFetchAudio(url)
-      if (!result) return m.reply("❌ No pude descargar el audio desde AlyaBot.")
+      if (!result) return m.reply("❌ No pude descargar el audio.")
 
       return await conn.sendMessage(m.chat, {
         audio: { url: result.file_url },
@@ -73,8 +73,8 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         fileName: `${result.title || "audio"}.mp3`,
         contextInfo: {
           externalAdReply: {
-            title: `🎧 Aquí tienes tu canción`,
-            body: `${packname || 'AlyaBot'} | ${dev || ''}`,
+            title: `🎧 ᴀǫᴜɪ ᴛɪᴇɴᴇs ≧◔◡◔≦`,
+            body: `{wm}`,
             thumbnailUrl: `https://i.postimg.cc/NF8BtxYg/20250617-143039.jpg`,
             thumbnail: thumb,
             mediaType: 1,
@@ -85,7 +85,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       }, { quoted: m })
     }
 
-    // 📹 VIDEO con múltiples APIs externas
+    
     if (type === "video") {
       const sources = [
         `https://api.zenkey.my.id/api/download/ytmp4?apikey=zenkey&url=${url}`,
@@ -144,7 +144,7 @@ handler.command = handler.help = ["play", "play2", "ytmp3", "yta", "ytmp4", "ytv
 handler.tags = ["downloader"]
 handler.register = true
 
-// ↪️ Manejo automático para comandos cortos
+
 handler.before = async (m, { conn }) => {
   if (!m.text || m.isBaileys || m.fromMe) return false;
   const text = m.text.trim().toLowerCase();
@@ -161,7 +161,7 @@ handler.before = async (m, { conn }) => {
   return false;
 };
 
-// Utilidad para vistas abreviadas
+
 function formatViews(views) {
   if (typeof views !== "number" || isNaN(views)) return "Desconocido"
   const abs = Math.abs(views)
