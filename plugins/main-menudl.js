@@ -128,4 +128,5 @@ let handler = async (m, { conn }) => {
 handler.help = ['menugif']
 handler.tags = ['menu']
 handler.command = ['menudl']
+handler.register = true;
 export default handler
