@@ -49,4 +49,5 @@ await conn.sendFile(m.chat, img, 'img.jpg', texto, fkontak)
 handler.help = ['menuhot (menu +18)']
 handler.tags = ['crow']
 handler.command = ['menu18', 'menuhorny', 'menunsfw', 'menuhot'] 
+handler.register = true;
 export default handler;
