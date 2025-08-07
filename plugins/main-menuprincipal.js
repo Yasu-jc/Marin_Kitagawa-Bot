@@ -9,7 +9,7 @@ let handler = async (m, { conn, args }) => {
   // Array de URLs de GIFs. Puedes agregar o quitar los enlaces que desees.
   const gifUrls = [
 
-`https://zero-two.info/uploads/videos/file-1754013053081-340721211.mp4`
+`https://files.cloudkuimages.guru/videos/S2BDRrYn.mp4`
     
  // 'https://zero-two.info/uploads/videos/file-1750697942583-439795193.mp4',
   //'https://zero-two.info/uploads/videos/file-1750697996985-639597320.mp4',
@@ -407,3 +407,4 @@ function clockString(ms) {
     let hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
     return `${hours}h ${minutes}m ${seconds}s`;
 }
+
