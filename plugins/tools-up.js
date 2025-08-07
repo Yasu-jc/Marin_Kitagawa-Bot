@@ -1,72 +1,103 @@
-import fetch from "node-fetch";
-import crypto from "crypto";
-import { FormData, Blob } from "formdata-node";
-import { fileTypeFromBuffer } from "file-type";
+
+//▪CÓDIGO BY DEVBRAYAN PRROS XD▪
+//▪ROXY BOT MD▪
+
+import { writeFile, unlink, readFile } from 'fs/promises'
+import { join } from 'path'
+import { fileTypeFromBuffer } from 'file-type'
 
 let handler = async (m, { conn }) => {
-  let q = m.quoted ? m.quoted : m;
-  let mime = (q.msg || q).mimetype || '';
-  if (!mime) return conn.reply(m.chat, `❀ Por favor, responde a un archivo válido (imagen, video, etc.).`, m);
-  
-  await m.react(rwait);
-  
+  await conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } })
+
   try {
-    let media = await q.download();
-    let isTele = /image\/(png|jpe?g|gif)|video\/mp4/.test(mime);
-    let { link, name } = await megaUpload(media);
-    
-    let txt = `*乂 M E G A - U P L O A D E R 乂*\n\n`;
-    txt += `*» Enlace* : ${link || 'No disponible'}\n`;
-    txt += `*» Nombre* : ${name}\n`;
-    txt += `*» Tamaño* : ${formatBytes(media.length)}\n`;
-    txt += `*» Expiración* : ${isTele ? 'No expira' : 'Desconocido'}\n\n`;
-    txt += `> *${dev}*`;
-    
-    await conn.sendFile(m.chat, media, 'thumbnail.jpg', txt, m, fkontak);
-    
-    await m.react(done);
-  } catch {
-    await m.react(error);
+    const q = m.quoted ? m.quoted : m
+    const mime = (q.msg || q).mimetype || ''
+    if (!mime) return m.reply('🌧️ *Responde a un archivo o media para subirlo.*')
+
+    const media = await q.download()
+    if (!media) return m.reply('⛅ *Error al descargar el archivo.*')
+
+    const uploads = []
+
+    const up1 = await uploaderCloudStack(media).catch(() => null)
+    if (up1) uploads.push({ name: '☁️ CloudStack', url: up1 })
+
+    const up2 = await uploaderCloudGuru(media).catch(() => null)
+    if (up2) uploads.push({ name: '🌀 CloudGuru', url: up2 })
+
+    const up3 = await uploaderCloudCom(media).catch(() => null)
+    if (up3) uploads.push({ name: '🌐 CloudImages', url: up3 })
+
+    if (uploads.length === 0) throw '⛈️ *No se pudo subir a ningún servidor. Intenta de nuevo más tarde.*'
+
+    let texto = `☁️ *Resultado de la Subida*\n*━━━━━━━━━━━━━━━━━━━━*\n\n`
+    for (const up of uploads) {
+      texto += `*${up.name}*\n🔗 ${up.url}\n\n`
+    }
+
+    await conn.sendMessage(m.chat, {
+      text: texto.trim(),
+      contextInfo: {
+        externalAdReply: {
+          title: 'Uploader Tools ☁️',
+          body: 'Enlaces generados desde servidores externos',
+          thumbnailUrl: uploads[0]?.url,
+          mediaType: 1,
+          renderLargerThumbnail: true
+        }
+      }
+    }, { quoted: m })
+
+  } catch (e) {
+    await conn.sendMessage(m.chat, {
+      text: typeof e === 'string' ? e : '⛈️ *Ocurrió un error inesperado durante la subida.*',
+      quoted: m
+    })
+  } finally {
+    await conn.sendMessage(m.chat, { react: { text: '', key: m.key } })
   }
-};
-
-handler.help = ['up'];
-handler.tags = ['transformador'];
-handler.command = ['up', 'to'];
-
-export default handler;
-
-function formatBytes(bytes) {
-  if (bytes === 0) {
-    return '0 B';
-  }
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${(bytes / 1024 ** i).toFixed(2)} ${sizes[i]}`;
 }
 
-async function megaUpload(content) {
-  const { ext, mime } = (await fileTypeFromBuffer(content)) || {};
-  const blob = new Blob([content], { type: mime });
-  const formData = new FormData();
-  const randomBytes = crypto.randomBytes(5).toString("hex");
-  formData.append("reqtype", "fileupload");
-  formData.append("fileToUpload", blob, randomBytes + "." + ext);
+handler.help = ['tourl']
+handler.tags = ['tools']
+handler.command = ['tourl','up'];
+handler.limit = true
+handler.register = true
 
-  const response = await fetch("https://cdnmega.vercel.app/upload", {
-    method: "POST",
-    body: formData,
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
-    },
-  });
+export default handler
 
-  const result = await response.json();
-  
-  if (result.success && result.files.length > 0) {
-    return { link: result.files[0].url, name: randomBytes + "." + ext };
-  } else {
-    return { link: null, name: randomBytes + "." + ext };
+// Función genérica para subir el buffer a un servidor
+async function uploadTo(url, buffer) {
+  const { ext, mime } = await fileTypeFromBuffer(buffer) || {}
+  if (!ext || !mime) throw new Error('Formato de archivo no reconocido.')
+
+  const tempPath = join('./tmp', `upload.${ext}`)
+  await writeFile(tempPath, buffer)
+  const fileData = await readFile(tempPath)
+
+  const form = new FormData()
+  form.append('file', new File([fileData], `upload.${ext}`, { type: mime }))
+
+  try {
+    const res = await fetch(url, { method: 'POST', body: form })
+    const json = await res.json()
+    await unlink(tempPath).catch(() => null)
+
+    if (json?.status !== 'success' || !json?.data?.url) throw new Error('Error al subir el archivo.')
+    return json.data.url
+  } catch (err) {
+    console.error(`Error subiendo a (${url}):`, err)
+    await unlink(tempPath).catch(() => null)
+    return null
   }
-} 
+}
+
+// URLs de los servicios de subida
+const uploaderCloudStack = buffer =>
+  uploadTo('https://phpstack-1487948-5667813.cloudwaysapps.com/upload.php', buffer)
+
+const uploaderCloudGuru = buffer =>
+  uploadTo('https://cloudkuimages.guru/upload.php', buffer)
+
+const uploaderCloudCom = buffer =>
+  uploadTo('https://cloudkuimages.com/upload.php', buffer)
