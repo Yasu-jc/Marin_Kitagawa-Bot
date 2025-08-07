@@ -1,14 +1,13 @@
-let handler = async (m, { conn, saludo, wm, vs }) => {
-  let userId = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.sender
-  let _uptime = process.uptime() * 1000
-  let uptime = clockString(_uptime)
-  let totalreg = Object.keys(global.db.data.users).length
+import moment from 'moment-timezone';
+import fs from 'fs';
+import { xpRange } from '../lib/levelling.js';
+import path from 'path';
 
-  let botname = global.botname || "NombreBot"
-  let dev = global.dev || "Mi Dev"
-  let redes = global.redes || "https://tucanal.com"
+const cwd = process.cwd();
 
-const gifLinks = [
+let handler = async (m, { conn, args }) => {
+  // Array de URLs de GIFs. Puedes agregar o quitar los enlaces que desees.
+  const gifUrls = [
 
 `https://zero-two.info/uploads/videos/file-1754013053081-340721211.mp4`
     
@@ -18,21 +17,46 @@ const gifLinks = [
  // 'https://zero-two.info/uploads/videos/file-1750698077733-694225094.mp4'
 ]
 
-  const randomGif = gifLinks[Math.floor(Math.random() * gifLinks.length)]
+  // Obtener ID del usuario
+  let userId = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.sender;
 
-  await m.react('❤️‍🔥')
+  // Obtener nombre del usuario
+  let name = await conn.getName(userId);
 
-  let txt = `𓍯𓂃𓏧♡𝐖𝐄𝐋𝐂𝐎𝐌𝐄𓍯𓂃𓏧♡
+  let user = global.db.data.users[userId];
+  let exp = user.exp || 0;
+  let level = user.level || 0;
+  let role = user.role || 'Sin Rango';
+  let coins = user.coin || 0;
+
+  // Obtener datos generales
+  let _uptime = process.uptime() * 1000;
+  let uptime = clockString(_uptime);
+  let totalreg = Object.keys(global.db.data.users).length;
+  let totalCommands = Object.values(global.plugins).filter(v => v.help && v.tags).length;
+
+  // Seleccionar un GIF aleatorio del array de URLs
+  const randomGifUrl = gifUrls[Math.floor(Math.random() * gifUrls.length)];
+
+  // Texto con info
+  let txt = `
+𓍯𓂃𓏧♡𝐖𝐄𝐋𝐂𝐎𝐌𝐄𓍯𓂃𓏧♡
 ₊‧.°.⋆✮⋆.°.‧₊(꯭${global.packname}𝐭𓏲֟፝₊✮⋆.°.
 . ݁₊ ⊹ . ݁˖ . ݁𝙱𝙾𝚃-𝙻𝙸𝚂𝚃ִֶָ𓂃 ࣪˖ ִֶָ🐇་༘࿐
 
 > ¡Hola, @${userId.split('@')[0]}, ${saludo} mi nombre es ${botname} (≧◡≦) 
 
 ✞͙͙͙͙͙͙͙͙͙͙⏜❟︵ֹ̩̥̩̥̩̥̩̩̥⏜੭♡୧ֹ⏜︵ֹ̩̥̩̥̩̥̩̥̩̥̩̥̩̥❟⏜፞✞͙͙͙͙͙͙͙͙͙͙.
-⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۪۬ Modo » Privado 
-⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۪۬ Activada » ${uptime}
-⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۪۬ Usuarios » ${totalreg}
-⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۬  Bot » ${(conn.user.jid == global.conn.user.jid ? 'Principal 🅥' : 'Sub-bot🅑')}
+┊⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۪۬ Modo » Privado 
+┊⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۪۬ Activada » ${uptime}
+┊⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۪۬ Usuarios » ${totalreg}
+┊⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۬  Bot » ${(conn.user.jid == global.conn.user.jid ? 'Principal 🅥' : 'Sub-bot🅑')}
+┊┈・──・──・﹕₊˚ ✦・୨୧・ 
+┊♡ ᴍᴇɴᴜ ᴅɪsᴘᴏɴɪʙʟᴇs:
+├┈・──・──・﹕₊˚ ✦・୨୧・ 
+┊҉.❦•̩̩͙#menu18 
+┊҉.❦•̩̩#menugp  
+┊҉.❦•̩̩#menudl
 *☆═━┈◈ ╰ ${vs}╯ ◈┈━═☆*
 *│* 
 *╰ ㊂ ▸▸ _𝙸𝚗𝚏𝚘-𝙱𝚘𝚝_ ◂◂*
@@ -322,7 +346,8 @@ const gifLinks = [
 *│* ┊▸ ✦ _ *#piropo*  
 *│* ┊▸ ✦ _ *#pregunta*  
 *│* ┊▸ ✦ _ *#ship • #pareja*  
-*│* ┊▸ ✦ _ *#sorteo*   *│* ┊▸ ✦ _*#top*  
+*│* ┊▸ ✦ _ *#sorteo*  
+*│* ┊▸ ✦ _*#top*  
 *│* ┊▸ ✦ _ *#formartrio* + <mención>  
 *│* ┊▸ ✦ _ *#ahorcado*  
 *│* ┊▸ ✦ _ *#genio*  
@@ -333,38 +358,52 @@ const gifLinks = [
 *│* ┊▸ ✦ _ *#ttt*  
 *│* ╰∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙ ∙ ∙ ∙ ∙
 *│*
-*╰ ㊂ ▸▸ _${dev}*`
+*╰ ㊂ ▸▸ _${dev}*
+  `.trim();
 
-  await conn.sendMessage(m.chat, {
-    video: { url: randomGif },
+    // Mensaje de inicio de envío del menú
+  
+
+    await m.react('💖');
+
+    // Enviar el video GIF con el texto en un solo mensaje
+    await conn.sendMessage(m.chat, { 
+    video: { url: randomGifUrl },
     caption: txt,
-    gifPlayback: true,
+    gifPlayback: true, // Hace que el video se vea como GIF
     contextInfo: {
-      mentionedJid: [m.sender, userId],
-      isForwarded: true,
-      forwardingScore: 999,
-      externalAdReply: {
-        title: `${global.wm}`,
-        body: `${dev}`,
-        thumbnailUrl: 'https://i.postimg.cc/Kv7Lcf7c/4581d7b3704643d9378eac636d9d394e.jpg',
-        sourceUrl: redes,
-        mediaType: 1,
-        renderLargerThumbnail: false,
-      }
+        mentionedJid: [m.sender, userId],
+        isForwarded: true,
+        forwardingScore: 999,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: '',
+            newsletterName: '⏤͟͞ू⃪፝͜⁞⟡『 𝐌𝐚𝐫𝐢𝐧 𝐊𝐢𝐭𝐚𝐠𝐚𝐰𝐚 』࿐⟡',
+            serverMessageId: -1,
+        },
+        externalAdReply: {
+            title: 'ׄ❀ׅᮢ໋۬۟   ׁ ᮫᩠𝗠𝗮𝗿𝗶𝗻 𝗞𝗶𝘁𝗮𝗴𝗮𝘄𝗮 ꫶֡ᰵ࡙🌸̵໋ׄᮬ͜✿֪',
+            body: dev,
+            thumbnail: icons,
+            sourceUrl: redes,
+            mediaType: 1,
+            renderLargerThumbnail: false,
+        }
     }
-  }, { quoted: m })
-}
+}, { quoted: m });
 
-handler.help = ['menu']
-handler.tags = ['main']
-handler.command = ['menu', 'help', 'menú', 'allmenú', 'allmenu', 'menucompleto']
+};
+
+
+handler.help = ['menu'];
 handler.register = true;
-export default handler
+handler.tags = ['main'];
+handler.command = ['menu','allmenu'];
+
+export default handler;
 
 function clockString(ms) {
-  let h = isNaN(ms) ? '--' : Math.floor(ms / 3600000)
-  let m = isNaN(ms) ? '--' : Math.floor(ms / 60000) % 60
-  let s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60
-  return [h, m, s].map(v => v.toString().padStart(2, 0)).join(':')
+    let seconds = Math.floor((ms / 1000) % 60);
+    let minutes = Math.floor((ms / (1000 * 60)) % 60);
+    let hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+    return `${hours}h ${minutes}m ${seconds}s`;
 }
-
