@@ -20,23 +20,37 @@ let chats = Object.entries(conn.chats).filter(([id, data]) => id && data.isChats
 let groups = Object.entries(conn.chats).filter(([jid, chat]) => jid.endsWith('@g.us') && chat.isChats && !chat.metadata?.read_only && !chat.metadata?.announce).map(v => v[0])
 
 
-let texto = `${emoji} *${packname}*
-🚀 *Velocidad:*
-→ ${latensi.toFixed(4)}
+let texto = `
+‿︵‿︵ʚ˚̣̣̣͙ɞ・🪁・ʚ˚̣̣̣͙ɞ‿︵‿︵
 
-🕒 *Activo Durante:*
-→ ${muptime}
+s̶y̶s̶t̶e̶m̶ ̶s̶t̶a̶t̶u̶s̶
+➜ \`🚀 ꒦꒷velocidad: ${latensi.toFixed(4)} ms\`
+➜ \`🕒 ꒦꒷activo por: ${muptime}\`
+➜ \`💌 ꒦꒷chats privados: ${chats.length}\`
+➜ \`🎀 ꒦꒷grupos: ${groups.length}\`
+➜ \`💻 ꒦꒷ram usada: ${format(totalmem() - freemem())} / ${format(totalmem())}\`
 
-💫 *Chats:*
-→ ${chats.length} *Chats privados*
-→ ${groups.length} *Grupos*
+»»————-　♡　————-«
 
-🏆 *Servidor:*
-➤ *Ram ⪼* ${format(totalmem() - freemem())} / ${format(totalmem())}`.trim()
+🧸 ꒰ ${packname} ꒱
+`.trim()
 
 m.react('✈️')
 
-conn.reply(m.chat, texto, m, )
+let imageUrl = 'https://i.postimg.cc/fTDTKV8x/e0287dbbd83754e62df09d0823a28447.jpg' 
+
+conn.reply(m.chat, texto, m, {
+  contextInfo: {
+    externalAdReply: {
+      title: '🌟 Estado del Bot',
+      body: '¡Mira el rendimiento actual del bot!',
+      thumbnailUrl: imageUrl,
+      sourceUrl: '', 
+      mediaType: 1, 
+      renderLargerThumbnail: null
+    }
+  }
+})
 
 }
 handler.help = ['speed']
