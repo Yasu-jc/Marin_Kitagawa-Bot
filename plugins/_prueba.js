@@ -1,7 +1,7 @@
 import yts from "yt-search";
 
 const handler = async (m, { conn, text, command }) => {
-  if (!text) return m.reply(`✨ *SoyMaycol* ✨
+  if (!text) return m.reply(`
 ⚡ Ingresa el nombre de un video o la URL de YouTube.
 💡 Usa .help para ver los comandos disponibles.`);
 
