@@ -1,17 +1,24 @@
 import fetch from 'node-fetch';
 
+
+function toJid(number) {
+    return number.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+}
+
 let handler = async (m, { conn }) => {
     try { await m.react('🧐'); } catch (e) {}
 
-    const senderName = await conn.getName(m.sender);
-    const senderMention = `@${m.sender.split('@')[0]}`; // 👈 para mención directa
+    const senderName = conn.getName ? await conn.getName(m.sender) : m.pushName || m.sender.split('@')[0];
+    const senderMention = `@${m.sender.split('@')[0]}`;
 
-    // Definir etiqueta por defecto si no existe
+
     const etiqueta = global.etiqueta || 'Saki_Ayase-Bot Owner';
+
 
     const owner1 = {
         name: etiqueta,
         number: '50577025053',
+        jid: toJid('50577025053'),
         email: 'x',
         github: 'https://github.com/Yasu-jc/Saki_Ayase-Bot',
         region: 'Nicaragua'
@@ -20,17 +27,19 @@ let handler = async (m, { conn }) => {
     const owner2 = {
         name: '𝔯𝔲𝔦𝔷 𝔇𝔬𝔪𝔦𝔫𝔞😈👺',
         number: '526636700428',
+        jid: toJid('526636700428'),
         email: 'X',
         github: 'X',
         region: 'México'
     };
 
+    // Crear vCard
     const createVCard = (owner) => `
 BEGIN:VCARD
 VERSION:3.0
 FN:${owner.name}
 item1.TEL;waid=${owner.number}:${owner.number}
-item1.X-ABLabel:Propietario de ${wm}
+item1.X-ABLabel:Propietario de ${global.wm || 'Saki_Ayase-Bot'}
 ${owner.email !== "x" ? `item2.EMAIL;type=INTERNET:${owner.email}\nitem2.X-ABLabel:Email` : ''}
 item3.URL:${owner.github}
 item3.X-ABLabel:GitHub
@@ -75,16 +84,20 @@ END:VCARD`;
 
     await conn.sendMessage(m.chat, {
         text: welcomeMessage,
-        mentions: [m.sender], 
+        mentions: [m.sender],
         quoted: contactMsg
     });
+
+    
 };
 
 handler.help = ['owner', 'creator'];
 handler.tags = ['main'];
 handler.command = ['owner', 'creator', 'creador', 'dueño'];
 
-export default handler
+export default handler;
+
+
 
 
 
