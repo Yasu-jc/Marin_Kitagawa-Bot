@@ -1,6 +1,6 @@
 <h1 align="center">『 𖤍𝐌𝐚𝐫𝐢𝐧_𝐊𝐢𝐭𝐚𝐠𝐚𝐰𝐚-𝐁𝐨𝐭 𖤍 』</h1>
 
-![line](https://github.com/BrayanOFC/Lines-Neon-MB/raw/main/assets/Logo-neon.jpg)
+![line](https://github.com/BrayanOFC/Lines-Neon-MB/raw/main/assets/logo-neon.gif)
 
 [![Ver video](https://i.postimg.cc/Kv7Lcf7c/4581d7b3704643d9378eac636d9d394e.jpg)](https://zero-two.info/uploads/videos/file-1750697942583-439795193.mp4)
 
