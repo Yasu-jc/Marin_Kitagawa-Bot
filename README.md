@@ -1,6 +1,15 @@
-<h1 align="center">『 𖤍𝐌𝐚𝐫𝐢𝐧_𝐊𝐢𝐭𝐚𝐠𝐚𝐰𝐚-𝐁𝐨𝐭 𖤍 』</h1>
+<h1 align="center">『 𖤍 𝐌𝐚𝐫𝐢𝐧_𝐊𝐢𝐭𝐚𝐠𝐚𝐰𝐚-𝐁𝐨𝐭 𖤍 』</h1>
 
-![line](https://github.com/BrayanOFC/Lines-Neon-MB/raw/main/assets/logo-neon.gif)
+<p align="center">
+<img src="https://github.com/BrayanOFC/Lines-Neon-MB/raw/main/assets/logo-neon.gif" width="400"/>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Versión-1.0-blue?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Estado-En%20Desarrollo-yellow?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white"/>
+  <img src="https://img.shields.io/badge/WhatsApp-Bot-brightgreen?style=for-the-badge&logo=whatsapp"/>
+</p>
 
 [![Ver video](https://i.postimg.cc/Kv7Lcf7c/4581d7b3704643d9378eac636d9d394e.jpg)](https://zero-two.info/uploads/videos/file-1750697942583-439795193.mp4)
 
@@ -17,30 +26,43 @@
 <details>
  <summary><b> ➮ Funciones</b></summary>
 
-> Bot en desarrollo si presenta alguna falla reportar al creador para darle una solución óptima.
+> Bot en desarrollo. Si presenta alguna falla, reportar al creador para darle una solución óptima.
 
-- [x] Interacción con voz y texto
-- [x] Configuración de grupo
-- [x] antidelete, antilink, antispam, etc
-- [x] Bienvenida personalizada
-- [x] Juegos, tictactoe, mate, etc
-- [x] Chatbot (simsimi)
-- [x] Chatbot (autoresponder)
-- [x] Crear sticker de image/video/gif/url
-- [x] SubBot (Jadibot)
-- [x] Buscador Google
-- [x] Juego RPG
-- [x] Personalizar imagen del menú
-- [x] Descarga de música y video De YT
-- [ ] Otros
+- ✅ Interacción con voz y texto  
+- 🔒 Antidelete, antilink, antispam  
+- 🙋 Bienvenida personalizada  
+- 🎮 Juegos: tictactoe, RPG, etc  
+- 🤖 Chatbot (Simsimi / autoresponder)  
+- 🖼️ Crear stickers (imagen / video / gif / url)  
+- 🤝 SubBot (Jadibot)  
+- 🔍 Buscador Google  
+- 🎵 Descarga música y video de YouTube  
+- 🎨 Personalizar imagen del menú  
+- 🚧 Otros en desarrollo...  
 
 </details>
 
 ---
 
+### **`📋 Comandos principales`**
+
+| Categoría | Comando | Descripción |
+|-----------|---------|-------------|
+| 🎮 Juegos | `.tictactoe` | Jugar gato con un amigo |
+| 🎮 RPG    | `.rpg` | Juego de rol integrado |
+| 🤖 Chatbot | `.simsimi` | Activa respuestas automáticas |
+| 🖼️ Stickers | `.sticker [img/gif/url]` | Genera sticker personalizado |
+| 🎵 Música | `.play [nombre]` | Descargar música de YouTube |
+| 📹 Video | `.video [nombre]` | Descargar video de YouTube |
+
+---
+
 ### **`✧ Click en la imagen para descargar termux ✧`**
-<a
-href="https://www.mediafire.com/file/llugt4zgj7g3n3u/com.termux_1020.apk/file"><img src="https://qu.ax/finc.jpg" height="125px"></a> 
+<a href="https://www.mediafire.com/file/llugt4zgj7g3n3u/com.termux_1020.apk/file">
+  <img src="https://qu.ax/finc.jpg" height="125px">
+</a> 
+
+---
 
 ### **`➮ Instalación por termux`**
 
@@ -48,63 +70,7 @@ href="https://www.mediafire.com/file/llugt4zgj7g3n3u/com.termux_1020.apk/file"><
  <summary><b> ✎ Click para ver los Comandos </b></summary>
 
 ### **❀ Instalación manual por termux**
-> Nota: Copie y pegue los comandos en termux uno por uno.
+> Nota: Copie y pegue los comandos en Termux uno por uno.
+
 ```bash
 termux-setup-storage
-```
-
-```bash
-apt update && apt upgrade && pkg install -y git nodejs ffmpeg imagemagick yarn
-```
-
-```bash
-git clone https://github.com/Yasu-jc/Marin_Kitagawa-Bot && cd Marin_Kitagawa-Bot 
-```
-
-```bash
-yarn install && npm install
-```
-
-```bash
-npm start
-```
-
-> Si aparece (Y/I/N/O/D/Z) [default=N] ? use la letra "y" + "ENTER" para continuar con la instalación
-
-### **🜸 Activar en caso de detenerse en termux**
-
-> Si después de instalar el bot en Termux se detiene (pantalla en blanco, pérdida de conexión a Internet, reinicio del dispositivo), sigue estos pasos:
-
-❒ Abre Termux y navega al directorio del bot:
-   
-   ```bash
-    cd Marin_Kitagawa-Bot 
-   ```
-
-❒ Inicia el bot nuevamente:
-  
-   ```bash
-    npm start
-   ```
-
-### **✰ Volverte owner del Bot**
-
-> Si después de instalar el bot en Termux y iniciar la session del bot (deseas poner tu número es la lista de owner pon este comando:
-
-   ```bash
-    cd Marin_Kitagawa-Bot && nano settings.js
-   ```
-
-</details>
-
----
-
-### **`❀ Colaboradores`**
-<a href="https://github.com/Yasu-jc/Marin_Kitagawa-Bot/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=Yasu-jc/Marin_Kitagawa-Bot" /> 
-</a>
-
-### **`ᥫ᭡ Propietario`**
-<a
-href="https://github.com/Yasu-jc"><img src="https://github.com/Yasu-jc.png" width="130" height="130" alt="
-iam|⨀⃝⃟⃞༺𝔜𝔞𝔰𝔲༻𝔣𝔣❀"/></a>
