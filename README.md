@@ -42,6 +42,9 @@
 
 ---
 
+<details>
+ <summary><b> ✎ Click para ver los Comandos </b></summary>
+
 ### **❀ Instalación manual por termux**
 > Nota: Copie y pegue los comandos en termux uno por uno.
 ```bash
