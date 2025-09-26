@@ -6,6 +6,12 @@
 
 [![Ver video](https://i.postimg.cc/Kv7Lcf7c/4581d7b3704643d9378eac636d9d394e.jpg)](https://zero-two.info/uploads/videos/file-1750697942583-439795193.mp4)
 
+<p align="center">
+<a href="https://github.com/Yasu-jc/Marin_Kitagawa-Bot"><img src="https://img.shields.io/github/stars/Yasu-jc/Marin_Kitagawa-Bot?style=social" alt="GitHub Stars"></a>
+<a href="https://github.com/Yasu-jc/Marin_Kitagawa-Bot/issues"><img src="https://img.shields.io/github/issues/Yasu-jc/Marin_Kitagawa-Bot" alt="Issues"></a>
+<a href="https://github.com/Yasu-jc/Marin_Kitagawa-Bot/graphs/contributors"><img src="https://img.shields.io/github/contributors/Yasu-jc/Marin_Kitagawa-Bot" alt="Contributors"></a>
+</p>
+
 ---
 
 ### **❕ Información importante**
@@ -19,23 +25,15 @@
 
 ---
 
-### **➮ Funciones principales**
-<details>
- <summary><b>Ver todas las funciones</b></summary>
-
-- [x] Interacción por **voz y texto**  
-- [x] Configuración avanzada de **grupo**  
-- [x] Protección: **antidelete, antilink, antispam**  
-- [x] **Bienvenida personalizada**  
-- [x] Juegos: **TicTacToe, Ajedrez, RPG**  
-- [x] Chatbot **Simsimi / Autoresponder**  
-- [x] Crear **stickers** desde imagen/video/gif/url  
-- [x] SubBot (**Jadibot**)  
-- [x] **Buscador Google integrado**  
-- [x] **Descarga de música y videos** de YouTube  
-- [x] Personalización de **imagen del menú**  
-- [ ] ¡Y muchas más por venir!
-</details>
+### **🚀 Comandos Destacados**
+| Categoría | Comando | Descripción |
+|-----------|---------|-------------|
+| General   | `!menu` | Muestra todos los comandos disponibles |
+| Chat      | `!chat [mensaje]` | Responde usando IA |
+| Juegos    | `!rpg` | Inicia juego RPG |
+| Stickers  | `!sticker [imagen/gif]` | Crea stickers desde medios |
+| Grupo     | `!welcome on/off` | Activa o desactiva bienvenida personalizada |
+| Música    | `!play [URL]` | Descarga y reproduce música de YouTube |
 
 ---
 
@@ -44,10 +42,54 @@
 
 ---
 
-### **➮ Instalación en Termux**
-<details>
- <summary><b>Ver comandos</b></summary>
-
-#### 1️⃣ Configuración inicial
+### **❀ Instalación manual por termux**
+> Nota: Copie y pegue los comandos en termux uno por uno.
 ```bash
 termux-setup-storage
+```
+
+```bash
+apt update && apt upgrade && pkg install -y git nodejs ffmpeg imagemagick yarn
+```
+
+```bash
+git clone https://github.com/Yasu-jc/Marin_Kitagawa-Bot && cd Marin_Kitagawa-Bot 
+```
+
+```bash
+yarn install && npm install
+```
+
+```bash
+npm start
+```
+
+> Si aparece (Y/I/N/O/D/Z) [default=N] ? use la letra "y" + "ENTER" para continuar con la instalación
+
+### **🜸 Activar en caso de detenerse en termux**
+
+> Si después de instalar el bot en Termux se detiene (pantalla en blanco, pérdida de conexión a Internet, reinicio del dispositivo), sigue estos pasos:
+
+❒ Abre Termux y navega al directorio del bot:
+   
+   ```bash
+    cd Marin_Kitagawa-Bot 
+   ```
+
+❒ Inicia el bot nuevamente:
+  
+   ```bash
+    npm start
+   ```
+
+### **✰ Volverte owner del Bot**
+
+> Si después de instalar el bot en Termux y iniciar la session del bot (deseas poner tu número es la lista de owner pon este comando:
+
+   ```bash
+    cd Marin_Kitagawa-Bot && nano settings.js
+   ```
+
+</details>
+
+---
