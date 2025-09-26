@@ -28,12 +28,12 @@
 ### **🚀 Comandos Destacados**
 | Categoría | Comando | Descripción |
 |-----------|---------|-------------|
-| General   | `!menu` | Muestra todos los comandos disponibles |
-| Chat      | `!chat [mensaje]` | Responde usando IA |
-| Juegos    | `!rpg` | Inicia juego RPG |
-| Stickers  | `!sticker [imagen/gif]` | Crea stickers desde medios |
-| Grupo     | `!welcome on/off` | Activa o desactiva bienvenida personalizada |
-| Música    | `!play [URL]` | Descarga y reproduce música de YouTube |
+| General   | `.menu` | Muestra todos los comandos disponibles |
+| Chat      | `.ia [mensaje]` | Responde usando IA |
+| Juegos    | `.rw,.w` | Inicia juegos RPG |
+| Stickers  | `.sticker,.s [imagen/gif]` | Crea stickers desde medios |
+| Grupo     | `.welcome on/off` | Activa o desactiva bienvenida personalizada |
+| Música    | `.play [URL] • [text]` | Descarga música desde YouTube|
 
 ---
 
