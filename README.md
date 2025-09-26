@@ -6,12 +6,26 @@
 
 [![Ver video](https://i.postimg.cc/Kv7Lcf7c/4581d7b3704643d9378eac636d9d394e.jpg)](https://zero-two.info/uploads/videos/file-1750697942583-439795193.mp4)
 
-<p align="center">
-<a href="https://github.com/Yasu-jc/Marin_Kitagawa-Bot"><img src="https://img.shields.io/github/stars/Yasu-jc/Marin_Kitagawa-Bot?style=social" alt="GitHub Stars"></a>
-<a href="https://github.com/Yasu-jc/Marin_Kitagawa-Bot/issues"><img src="https://img.shields.io/github/issues/Yasu-jc/Marin_Kitagawa-Bot" alt="Issues"></a>
-<a href="https://github.com/Yasu-jc/Marin_Kitagawa-Bot/graphs/contributors"><img src="https://img.shields.io/github/contributors/Yasu-jc/Marin_Kitagawa-Bot" alt="Contributors"></a>
-</p>
+### **🌟 Propietario y Colaboradores**
 
+<p align="center">
+  <!-- Foto del creador -->
+  <a href="https://github.com/Yasu-jc">
+    <img src="https://github.com/Yasu-jc.png" width="80" height="80" alt="Propietario" />
+  </a>
+
+  <!-- Fotos de los contribuyentes -->
+  <a href="https://github.com/Colaborador1">
+    <img src="https://github.com/Colaborador1.png" width="50" height="50" alt="Colaborador 1" />
+  </a>
+  <a href="https://github.com/Colaborador2">
+    <img src="https://github.com/Colaborador2.png" width="50" height="50" alt="Colaborador 2" />
+  </a>
+  <a href="https://github.com/Colaborador3">
+    <img src="https://github.com/Colaborador3.png" width="50" height="50" alt="Colaborador 3" />
+  </a>
+  <!-- Agrega más colaboradores si es necesario -->
+</p>
 ---
 
 ### **❕ Información importante**
