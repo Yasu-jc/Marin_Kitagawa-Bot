@@ -1,4 +1,4 @@
-<h1 align="center">『 𖤍 𝐌𝐚𝐫𝐢𝐧_𝐊𝐢𝐭𝐚𝐠𝐚𝐰𝐚-𝐁𝐨𝐭 𖤍 』</h1>  
+<h1 align="center">『 𖤍 𝐌𝐚𝐫𝐢𝐧_𝐊𝐢𝐭ag𝐚w𝐚-𝐁𝐨𝐭 𖤍 』</h1>  
 <p align="center">  
 <img src="https://github.com/BrayanOFC/Lines-Neon-MB/raw/main/assets/logo-neon.gif" alt="logo" />  
 </p>  
@@ -11,13 +11,21 @@
 
 ---
 
-## 💻 Creador y Contribuidores
+## 👑 Creador (Owner)
 
 <p align="center">
   <a href="https://github.com/Yasu-jc" target="_blank">
-    <img src="https://github.com/Yasu-jc.png?size=50" alt="Creador" height="50px" width="50px" title="Creador: Yasu-jc" style="border-radius: 50%;">
+    <img src="https://github.com/Yasu-jc.png?size=80" alt="Creador" height="80px" width="80px" title="Creador: Yasu-jc" style="border-radius: 50%;">
   </a>
-  </p>
+</p>
+
+---
+
+## 🛠️ Contribuidores
+
+<p align="center">
+  ¡Sé el primero en contribuir!
+</p>
 
 ---
 
