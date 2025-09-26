@@ -57,20 +57,28 @@
 
 ---
 
-### **`✧ Click en la imagen para descargar termux ✧`**
+### **`✧ Click en la imagen para descargar Termux ✧`**
 <a href="https://www.mediafire.com/file/llugt4zgj7g3n3u/com.termux_1020.apk/file">
   <img src="https://qu.ax/finc.jpg" height="125px">
 </a> 
 
 ---
 
-### **`➮ Instalación por termux`**
+### **`➮ Instalación por Termux (completa)`**
 
 <details>
- <summary><b> ✎ Click para ver los Comandos </b></summary>
+ <summary><b> ✎ Click aquí para ver todos los comandos </b></summary>
 
-### **❀ Instalación manual por termux**
-> Nota: Copie y pegue los comandos en Termux uno por uno.
-
+#### 📌 Preparar Termux
 ```bash
 termux-setup-storage
+---
+apt update && apt upgrade && pkg install -y git nodejs ffmpeg imagemagick yarn
+---
+git clone https://github.com/Yasu-jc/Marin_Kitagawa-Bot
+cd Marin_Kitagawa-Bot
+---
+yarn install && npm install
+---
+npm start
+
