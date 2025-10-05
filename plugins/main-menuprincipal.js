@@ -1,54 +1,31 @@
-import moment from 'moment-timezone';
-import fs from 'fs';
-import { xpRange } from '../lib/levelling.js';
-import path from 'path';
+import fetch from 'node-fetch'
 
-const cwd = process.cwd();
+
+const mediaUrls = [ `https://files.catbox.moe/y9eveu.mp4`, ];
 
 let handler = async (m, { conn, args }) => {
-  // Array de URLs de GIFs. Puedes agregar o quitar los enlaces que desees.
-  const gifUrls = [
+    let mentionedJid = await m.mentionedJid;
+    let userId = mentionedJid && mentionedJid[0] ? mentionedJid[0] : m.sender;
+    let totalreg = Object.keys(global.db.data.users).length;
+    let totalCommands = Object.values(global.plugins).filter((v) => v.help && v.tags).length;
 
-`https://files.cloudkuimages.guru/videos/S2BDRrYn.mp4`
-    
- // 'https://zero-two.info/uploads/videos/file-1750697942583-439795193.mp4',
-  //'https://zero-two.info/uploads/videos/file-1750697996985-639597320.mp4',
- // 'https://zero-two.info/uploads/videos/file-1750698044012-984946042.mp4',
- // 'https://zero-two.info/uploads/videos/file-1750698077733-694225094.mp4'
-]
 
-  // Obtener ID del usuario
-  let userId = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.sender;
+    if (mediaUrls.length === 0) {
+        return m.reply('❌ No hay URLs de imágenes/videos configuradas para el menú.');
+    }
+    const randomMediaUrl = mediaUrls[Math.floor(Math.random() * mediaUrls.length)];
+    const isVideo = randomMediaUrl.endsWith('.mp4') || randomMediaUrl.endsWith('.gif');
 
-  // Obtener nombre del usuario
-  let name = await conn.getName(userId);
 
-  let user = global.db.data.users[userId];
-  let exp = user.exp || 0;
-  let level = user.level || 0;
-  let role = user.role || 'Sin Rango';
-  let coins = user.coin || 0;
-
-  // Obtener datos generales
-  let _uptime = process.uptime() * 1000;
-  let uptime = clockString(_uptime);
-  let totalreg = Object.keys(global.db.data.users).length;
-  let totalCommands = Object.values(global.plugins).filter(v => v.help && v.tags).length;
-
-  // Seleccionar un GIF aleatorio del array de URLs
-  const randomGifUrl = gifUrls[Math.floor(Math.random() * gifUrls.length)];
-
-  // Texto con info
-  let txt = `
+    let txt = `
 𓍯𓂃𓏧♡𝐖𝐄𝐋𝐂𝐎𝐌𝐄𓍯𓂃𓏧♡
 ₊‧.°.⋆✮⋆.°.‧₊(꯭${global.packname}𝐭𓏲֟፝₊✮⋆.°.
 . ݁₊ ⊹ . ݁˖ . ݁𝙱𝙾𝚃-𝙻𝙸𝚂𝚃ִֶָ𓂃 ࣪˖ ִֶָ🐇་༘࿐
 
-> ¡Hola, @${userId.split('@')[0]}, ${saludo} mi nombre es ${botname} (≧◡≦) 
+> ¡Hola, @${userId.split('@')[0]}, mi nombre es ${botname} (≧◡≦) 
 
 ✞͙͙͙͙͙͙͙͙͙͙⏜❟︵ֹ̩̥̩̥̩̥̩̩̥⏜੭♡୧ֹ⏜︵ֹ̩̥̩̥̩̥̩̥̩̥̩̥̩̥❟⏜፞✞͙͙͙͙͙͙͙͙͙͙.
 ┊⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۪۬ Modo » Privado 
-┊⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۪۬ Activada » ${uptime}
 ┊⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۪۬ Usuarios » ${totalreg}
 ┊⬪࣪ꥈ𑁍⃪࣭۪ٜ݊݊݊݊݊໑ٜ࣪⚘۬  Bot » ${(conn.user.jid == global.conn.user.jid ? 'Principal 🅥' : 'Sub-bot🅑')}
 ┊┈・──・──・﹕₊˚ ✦・୨୧・ 
@@ -359,54 +336,46 @@ let handler = async (m, { conn, args }) => {
 *│* ╰∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙ ∙ ∙ ∙ ∙
 *│*
 *╰ ㊂ ▸▸ _${dev}*
-  `.trim();
+`.trim();
 
-    // Mensaje de inicio de envío del menú
-  
 
-    await m.react('💖');
-
-    // Enviar el video GIF con el texto en un solo mensaje
-    await conn.sendMessage(m.chat, { 
-    video: { url: randomGifUrl },
-    caption: txt,
-    gifPlayback: true, // Hace que el video se vea como GIF
-    contextInfo: {
-        mentionedJid: [m.sender, userId],
-        isForwarded: true,
-        forwardingScore: 999,
-        forwardedNewsletterMessageInfo: {
-            newsletterJid: '',
-            newsletterName: '⏤͟͞ू⃪፝͜⁞⟡『 𝐌𝐚𝐫𝐢𝐧 𝐊𝐢𝐭𝐚𝐠𝐚𝐰𝐚 』࿐⟡',
-            serverMessageId: -1,
-        },
-        externalAdReply: {
-            title: 'ׄ❀ׅᮢ໋۬۟   ׁ ᮫᩠𝗠𝗮𝗿𝗶𝗻 𝗞𝗶𝘁𝗮𝗴𝗮𝘄𝗮 ꫶֡ᰵ࡙🌸̵໋ׄᮬ͜✿֪',
-            body: dev,
-            thumbnail: icons,
-            sourceUrl: redes,
-            mediaType: 1,
-            renderLargerThumbnail: false,
+    // Se ajusta el objeto de mensaje para enviar imagen o video
+    let messageOptions = {
+        caption: txt,
+        contextInfo: {
+            mentionedJid: [userId],
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+                newsletterJid: channelRD.id,
+                serverMessageId: '',
+                newsletterName: channelRD.name
+            },
+            externalAdReply: {
+                title: botname,
+                body: textbot,
+                mediaType: 1,
+                mediaUrl: redes,
+                sourceUrl: redes,
+                thumbnail: await (await fetch(banner)).buffer(),
+                showAdAttribution: false,
+                containsAutoReply: true,
+                renderLargerThumbnail: false
+            }
         }
-    }
-}, { quoted: m });
+    };
 
+    if (isVideo) {
+        messageOptions.video = { url: randomMediaUrl };
+        messageOptions.gifPlayback = true;
+    } else {
+        messageOptions.image = { url: randomMediaUrl };
+    }
+
+    await conn.sendMessage(m.chat, messageOptions, { quoted: m });
 };
 
-
 handler.help = ['menu'];
-handler.register = true;
 handler.tags = ['main'];
-handler.command = ['menu','allmenu'];
+handler.command = ['menu', 'menú', 'help'];
 
 export default handler;
-
-function clockString(ms) {
-    let seconds = Math.floor((ms / 1000) % 60);
-    let minutes = Math.floor((ms / (1000 * 60)) % 60);
-    let hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
-    return `${hours}h ${minutes}m ${seconds}s`;
-}
-
-
-
